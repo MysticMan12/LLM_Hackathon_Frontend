@@ -207,6 +207,43 @@ ul.files{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
 details.adv{font-size:.92rem}
 details.adv summary{cursor:pointer;font-weight:600;color:var(--muted)}
 .res{padding-top:44px}
+
+/* ---- aesthetic layer ---- */
+body{background:
+  radial-gradient(900px 520px at 88% -8%, color-mix(in srgb,var(--accent) 14%,transparent), transparent 62%),
+  radial-gradient(760px 480px at -8% 108%, color-mix(in srgb,var(--saffron) 16%,transparent), transparent 60%),
+  var(--bg);background-attachment:fixed}
+header.top{background:color-mix(in srgb,var(--bg) 72%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom-color:color-mix(in srgb,var(--line) 70%,transparent)}
+.btn{transition:transform .18s ease,box-shadow .18s ease,background .18s ease}
+.btn.primary{box-shadow:0 10px 24px -12px color-mix(in srgb,var(--accent) 80%,transparent)}
+.btn.primary:hover{transform:translateY(-2px);box-shadow:0 16px 30px -14px color-mix(in srgb,var(--accent) 90%,transparent)}
+.btn.big{border-radius:999px;padding:15px 26px}
+.card,.ticket,.bigdrop{box-shadow:0 1px 2px rgba(40,15,8,.04),0 12px 32px -20px rgba(40,15,8,.22)}
+.hero{grid-template-columns:1fr 1fr;gap:28px;padding:56px 0 64px}
+.hero h1 .hl{color:var(--accent);font-style:italic}
+.fade{opacity:0;transform:translateY(14px);animation:fadeUp .7s cubic-bezier(.2,.7,.2,1) forwards}
+.fade:nth-child(2){animation-delay:.08s}.fade:nth-child(3){animation-delay:.16s}.fade:nth-child(4){animation-delay:.24s}.fade:nth-child(5){animation-delay:.32s}
+@keyframes fadeUp{to{opacity:1;transform:none}}
+
+/* 3D food stage */
+.stage{position:relative;width:100%;max-width:540px;aspect-ratio:1;margin:0 auto}
+.stage::before{content:"";position:absolute;inset:11%;border-radius:50%;
+  background:radial-gradient(circle at 38% 32%,var(--surface) 0,color-mix(in srgb,var(--soft) 85%,var(--surface)) 55%,var(--soft) 100%);
+  box-shadow:inset 0 -30px 70px -40px color-mix(in srgb,var(--accent) 45%,transparent),0 40px 80px -50px color-mix(in srgb,var(--accent) 60%,transparent)}
+.stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab;touch-action:pan-y}
+.stage canvas:active{cursor:grabbing}
+.stage .plate{top:50%;width:52%;box-shadow:0 24px 40px -24px rgba(60,20,10,.5)}
+.stage.live .plate{display:none}
+.chip{position:absolute;left:4%;bottom:3%;z-index:2;max-width:250px;padding:12px 16px;border-radius:18px;
+  background:color-mix(in srgb,var(--surface) 72%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border:1px solid color-mix(in srgb,var(--line) 80%,transparent);box-shadow:0 18px 40px -24px rgba(40,15,8,.45);
+  animation:floaty 6s ease-in-out infinite}
+.chip span{display:block;font:600 .7rem var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.chip strong{display:block;font:800 1.08rem/1.15 var(--display);margin:3px 0}
+.chip em{font-style:normal;font-size:.82rem;color:var(--muted)}
+@keyframes floaty{50%{transform:translateY(-8px)}}
+@media (prefers-reduced-motion:reduce){.fade{animation:none;opacity:1;transform:none}.chip{animation:none}}
+@media (max-width:860px){.hero{grid-template-columns:1fr;padding-top:28px}.stage{max-width:420px}.chip{display:none}}
 </style>
 </head>
 <body>
@@ -616,15 +653,15 @@ function msgs(o){return (o.e.length?`<div class="note bad" role="alert"><ul clas
 function viewHome(){
   return `<section class="hero">
     <div class="stack" style="gap:22px">
-      <h1>Turn last week’s sales into this week’s video.</h1>
-      <p class="lead">Add your menu, sales and dish photos. PlateReel picks a dish to promote, writes the post and builds a short vertical video.</p>
-      <div><a class="btn primary big" href="#assets">Create a campaign</a></div>
-      <ol class="steps3"><li><b>1</b>Add files</li><li><b>2</b>Review recommendation</li><li><b>3</b>Get your campaign</li></ol>
-      <p class="muted" style="font-size:.88rem">No files handy? <button class="linkish" data-act="demo" ${S.busy.demo?'disabled':''}>${S.busy.demo?'Loading sample…':'Try it with sample data'}</button></p>
+      <h1 class="fade">Turn last week’s sales into <span class="hl">this week’s video.</span></h1>
+      <p class="lead fade">Add your menu, sales and dish photos. PlateReel picks a dish to promote, writes the post and builds a short vertical video.</p>
+      <div class="fade"><a class="btn primary big" href="#assets">Create a campaign</a></div>
+      <ol class="steps3 fade"><li><b>1</b>Add files</li><li><b>2</b>Review recommendation</li><li><b>3</b>Get your campaign</li></ol>
+      <p class="muted fade" style="font-size:.88rem">No files handy? <button class="linkish" data-act="demo" ${S.busy.demo?'disabled':''}>${S.busy.demo?'Loading sample…':'Try it with sample data'}</button></p>
     </div>
-    <div class="phone" role="img" aria-label="Example of a vertical promo video frame with a headline over a dish photo">
-      <span class="tag-ex">EXAMPLE</span><div class="plate"></div>
-      <div class="cap"><span>This week</span><strong>Crispy, tangy, gone by Friday.</strong><span>Fried Green Tomatoes · $7.50</span></div>
+    <div class="stage ${Food.canvas?'live':''}" id="stage" role="img" aria-label="Animated 3D burger, donut, pizza slice, cherry and macaron floating over a plate">
+      <div class="plate"></div>
+      <div class="chip"><span>Example post</span><strong>Crispy, tangy, gone by Friday.</strong><em>Fried Green Tomatoes · $7.50</em></div>
     </div>
   </section>`;
 }
@@ -744,7 +781,105 @@ function render(){
   renderNav();
   $('#app').innerHTML={home:viewHome,assets:viewAssets,recommendation:viewRecommend,results:viewResults}[S.view]();
   document.title='PlateReel';
+  if(S.view==='home') mountFood();
 }
+
+/* ---------- 3D food (home hero). Three.js loads after the page; if it can't, a flat plate stays. ---------- */
+const Food={canvas:null};
+function mountFood(){
+  const st=$('#stage'); if(!st||!Food.canvas) return;
+  st.prepend(Food.canvas); st.classList.add('live');
+  if(Food.ro) Food.ro.disconnect(); Food.ro=new ResizeObserver(()=>Food.resize(st)); Food.ro.observe(st);
+  Food.resize(st); Food.start();
+}
+function initFood(){
+  const T=window.THREE; if(!T) return;
+  let r; try{ r=new T.WebGLRenderer({antialias:true,alpha:true}); }catch(e){ return; }
+  if(!r.getContext()) return;
+  r.setPixelRatio(Math.min(2,window.devicePixelRatio||1)); r.outputEncoding=T.sRGBEncoding;
+  const still=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const scene=new T.Scene(), cam=new T.PerspectiveCamera(35,1,.1,100);
+  scene.add(new T.HemisphereLight(0xfff6ef,0xb98a7a,.62));
+  const key=new T.DirectionalLight(0xfff1e6,.95); key.position.set(4,7,6); scene.add(key);
+  const rim=new T.DirectionalLight(0xffc9a0,.7); rim.position.set(-6,-1,-5); scene.add(rim);
+  let seed=11; const rnd=()=>(seed=seed*16807%2147483647)/2147483647;
+  const M=(c,ro=.55)=>new T.MeshStandardMaterial({color:c,roughness:ro,metalness:0});
+  const mk=(g,m,p,rt,s)=>{const o=new T.Mesh(g,m); if(p)o.position.set(...p); if(rt)o.rotation.set(...rt); if(s)o.scale.set(...s); return o;};
+  const grp=(...k)=>{const g=new T.Group(); k.forEach(x=>g.add(x)); return g;};
+
+  // burger
+  const bun=M(0xE9A04B,.5), burger=grp(
+    mk(new T.CylinderGeometry(1.32,1.22,.42,48),bun,[0,-.86,0]),
+    mk(new T.CylinderGeometry(1.46,1.46,.42,48),M(0x6B3A22,.85),[0,-.44,0]),
+    mk(new T.BoxGeometry(2.5,.07,2.5),M(0xF9C846,.4),[0,-.2,0],[0,Math.PI/4,0]),
+    mk(new T.CylinderGeometry(1.3,1.3,.14,48),M(0xE5533C,.45),[0,-.08,0]),
+    mk(new T.CylinderGeometry(1.55,1.5,.1,13),M(0x7CC36B,.6),[0,.04,0]),
+    mk(new T.SphereGeometry(1.4,48,24,0,Math.PI*2,0,Math.PI/2),bun,[0,.08,0],null,[1,.8,1]));
+  const seedM=M(0xFFF3D6,.4);
+  for(let i=0;i<16;i++){ const th=rnd()*Math.PI*2, ph=.25+rnd()*.85;
+    burger.add(mk(new T.SphereGeometry(.06,8,6),seedM,[Math.sin(ph)*Math.cos(th)*1.4,.08+Math.cos(ph)*1.12,Math.sin(ph)*Math.sin(th)*1.4],[rnd()*3,rnd()*3,0],[1,.5,1.9])); }
+
+  // donut
+  const donut=grp(
+    mk(new T.TorusGeometry(.75,.36,24,56),M(0xE3A86B,.6)),
+    mk(new T.TorusGeometry(.76,.335,24,56),M(0xF7A1BE,.35),[0,0,.13],null,[1,1,.62]));
+  const spr=[0xFFFFFF,0x7FC8F8,0xFFD166,0x9BE39B,0xB78CF2];
+  for(let i=0;i<26;i++){ const u=rnd()*Math.PI*2, v=.5+rnd()*2.1, R=.76+.34*Math.cos(v);
+    donut.add(mk(new T.CylinderGeometry(.028,.028,.16,6),M(spr[i%spr.length],.4),[R*Math.cos(u),R*Math.sin(u),.15+.34*.62*Math.sin(v)],[rnd()*3,rnd()*3,rnd()*3])); }
+
+  // pizza slice
+  const sh=new T.Shape(); sh.moveTo(0,-1.1); sh.lineTo(.86,.8); sh.quadraticCurveTo(0,1.02,-.86,.8); sh.lineTo(0,-1.1);
+  const sg=new T.ExtrudeGeometry(sh,{depth:.12,bevelEnabled:true,bevelThickness:.04,bevelSize:.04,bevelSegments:3}); sg.translate(0,.05,-.06);
+  const pizza=grp(mk(sg,M(0xF6C453,.5)),
+    mk(new T.CylinderGeometry(.15,.15,1.86,20),M(0xD98C3E,.6),[0,.9,0],[0,0,Math.PI/2]));
+  [[0,.32],[-.3,.58],[.3,.6],[.04,-.3]].forEach(([x,y])=>pizza.add(mk(new T.CylinderGeometry(.16,.16,.04,24),M(0xC0392B,.5),[x,y,.13],[Math.PI/2,0,0])));
+
+  // cherry
+  const cherry=grp(
+    mk(new T.SphereGeometry(.44,32,24),M(0xD7263D,.25)),
+    mk(new T.CylinderGeometry(.025,.03,.75,8),M(0x5B7A2E,.7),[.1,.68,0],[0,0,-.28]),
+    mk(new T.SphereGeometry(.2,16,10),M(0x6FB45A,.6),[.32,.95,0],[0,0,.6],[1,.22,.5]));
+
+  // macaron
+  const shell=M(0x9FD9C2,.6), macaron=grp(
+    mk(new T.SphereGeometry(.62,32,16),shell,[0,.2,0],null,[1,.36,1]),
+    mk(new T.CylinderGeometry(.55,.55,.2,32),M(0xFFF1E0,.5)),
+    mk(new T.SphereGeometry(.62,32,16),shell,[0,-.2,0],null,[1,.36,1]));
+
+  // [object, position, scale, tilt, spin: 'turn' = full turn, number = sway]
+  const items=[[burger,[0,-.15,0],1.2,[.42,0,0],'turn'],[donut,[-2.65,2.05,-1],1,[-.25,.3,.2],.6],
+    [cherry,[2.75,2.25,-.6],1,[.1,0,0],'turn'],[macaron,[-3.25,-.4,.2],1,[.5,0,.2],'turn'],[pizza,[2.6,-2.1,0],.95,[-.45,-.2,.35],.5]]
+    .map(([o,p,s,rt,sp],i)=>{const outer=grp(o); outer.position.set(...p); outer.rotation.set(...rt); scene.add(outer);
+      return {o,outer,p,s,sp,ph:i*1.3,delay:i*.12};});
+
+  const ptr={x:0,y:0,tx:0,ty:0}; let drag=null, vel=.35, ang=0;
+  addEventListener('pointermove',e=>{ if(!Food.canvas.isConnected) return; const b=Food.canvas.getBoundingClientRect();
+    ptr.tx=Math.max(-1,Math.min(1,((e.clientX-b.left)/b.width-.5)*2)); ptr.ty=Math.max(-1,Math.min(1,((e.clientY-b.top)/b.height-.5)*2));
+    if(drag!==null){ vel=(e.clientX-drag)*.02; drag=e.clientX; } });
+  r.domElement.addEventListener('pointerdown',e=>{ drag=e.clientX; });
+  addEventListener('pointerup',()=>{ drag=null; });
+
+  const ease=x=>{x=Math.min(1,Math.max(0,x)); const c=1.7; return 1+(c+1)*Math.pow(x-1,3)+c*Math.pow(x-1,2);};
+  let t0=null, last=0;
+  function draw(now){
+    const t=still?10:(now-(t0??=now))/1000, dt=Math.min(.05,(now-last)/1000||0); last=now;
+    ptr.x+=(ptr.tx-ptr.x)*.05; ptr.y+=(ptr.ty-ptr.y)*.05;
+    if(drag===null) vel+=(.35-vel)*.02; ang+=vel*dt;
+    items.forEach(it=>{ const k=ease((t-it.delay)/.9)*it.s, bob=still?0:Math.sin(t*1.1+it.ph)*.16;
+      it.outer.scale.setScalar(Math.max(.001,k));
+      it.outer.position.set(it.p[0]+ptr.x*.25*(1+it.p[2]*.3), it.p[1]+bob-ptr.y*.2, it.p[2]);
+      it.o.rotation.y = it.sp==='turn' ? (it.o===burger?ang:t*.5+it.ph) : Math.sin(t*it.sp+it.ph)*.55;
+      it.o.rotation.x = ptr.y*.15; });
+    r.render(scene,cam);
+  }
+  function loop(now){ if(!r.domElement.isConnected){ Food.raf=0; return; } Food.raf=requestAnimationFrame(loop); if(!document.hidden) draw(now); }
+  Food.start=()=>{ if(still) draw(performance.now()); else if(!Food.raf) Food.raf=requestAnimationFrame(loop); };
+  Food.resize=st=>{ const w=st.clientWidth,h=st.clientHeight; if(!w||!h) return; r.setSize(w,h,false); cam.aspect=w/h;
+    cam.position.set(0,0,15*Math.max(1,1/cam.aspect)); cam.updateProjectionMatrix(); if(still) draw(performance.now()); };
+  Food.canvas=r.domElement; Food.canvas.setAttribute('aria-hidden','true');
+  mountFood();
+}
+(()=>{ const s=document.createElement('script'); s.src='https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js'; s.onload=initFood; document.head.appendChild(s); })();
 
 /* ---------- events ---------- */
 document.addEventListener('click',e=>{
