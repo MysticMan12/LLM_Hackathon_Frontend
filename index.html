@@ -6,29 +6,30 @@
 <title>PlateReel</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Tiro+Devanagari+Hindi:ital@0;1&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 /* Layout idea: a kitchen pass. Left = paperwork (tickets, CSV rows in mono), right = the plate (9:16 phone frame). */
 :root{
-  --bg:#F5F2F1; --surface:#FFFFFF; --ink:#201613; --muted:#6B5E59; --line:#E2DBD7;
-  --accent:#D7381C; --accent-ink:#FFFFFF; --soft:#FBE7E1; --saffron:#F3B02A;
+  --bg:#FFF6EA; --surface:#FFFCF6; --ink:#2B1510; --muted:#7A5648; --line:#EFD9C2;
+  --accent:#C2410C; --accent-ink:#FFFFFF; --soft:#FFE6CC; --saffron:#F2A100; --rani:#C2185B; --peacock:#0E7C7B;
   --good:#256F49; --warn:#8F5600; --bad:#B3261E; --good-soft:#E1F1E8; --warn-soft:#FBEFD6; --bad-soft:#FBE4E2;
-  --display:"Bricolage Grotesque","Arial Narrow",system-ui,sans-serif;
+  --display:"Rozha One","Tiro Devanagari Hindi",Georgia,serif;
+  --dev:"Tiro Devanagari Hindi",serif;
   --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
   --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
-  --r:14px;
+  --r:16px;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#17110F; --surface:#221916; --ink:#F6EEEA; --muted:#B5A69F; --line:#3B2E29;
-    --accent:#FF6B4A; --accent-ink:#1E0C07; --soft:#3A211A; --saffron:#F6BD4B;
+    --bg:#170D12; --surface:#24161D; --ink:#FCEFE2; --muted:#C9AE9F; --line:#3F2A31;
+    --accent:#FF7A2E; --accent-ink:#1E0A02; --soft:#3B2017; --saffron:#FFC23D; --rani:#FF5C9A; --peacock:#43C6C0;
     --good:#74D3A0; --warn:#F2B963; --bad:#FF8F85; --good-soft:#1C3327; --warn-soft:#3A2C12; --bad-soft:#421E1B;
     color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
-  --bg:#17110F; --surface:#221916; --ink:#F6EEEA; --muted:#B5A69F; --line:#3B2E29;
-  --accent:#FF6B4A; --accent-ink:#1E0C07; --soft:#3A211A; --saffron:#F6BD4B;
+  --bg:#170D12; --surface:#24161D; --ink:#FCEFE2; --muted:#C9AE9F; --line:#3F2A31;
+  --accent:#FF7A2E; --accent-ink:#1E0A02; --soft:#3B2017; --saffron:#FFC23D; --rani:#FF5C9A; --peacock:#43C6C0;
   --good:#74D3A0; --warn:#F2B963; --bad:#FF8F85; --good-soft:#1C3327; --warn-soft:#3A2C12; --bad-soft:#421E1B;
   color-scheme:dark;
 }
@@ -52,7 +53,8 @@ img{max-width:100%}
 header.top{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
 .top .wrap{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding-top:10px;padding-bottom:10px}
 .brand{display:flex;align-items:center;gap:9px;font:800 1.25rem var(--display);text-decoration:none}
-.brand i{width:26px;height:26px;border-radius:50%;background:var(--accent);box-shadow:inset 0 0 0 5px var(--accent),inset 0 0 0 7px var(--accent-ink);display:block}
+.brand i{width:28px;height:28px;border-radius:50%;display:block;background:radial-gradient(circle,var(--rani) 0 20%,var(--bg) 21% 31%,transparent 32%),repeating-conic-gradient(var(--accent) 0 15deg,var(--saffron) 0 30deg);animation:spinb 24s linear infinite}
+@keyframes spinb{to{transform:rotate(1turn)}}
 nav.steps{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
 nav.steps a{display:flex;align-items:center;gap:7px;padding:7px 12px;border-radius:999px;text-decoration:none;font-weight:600;font-size:.92rem;color:var(--muted)}
 nav.steps a b{font:600 .72rem var(--mono);border:1.5px solid currentColor;border-radius:50%;width:20px;height:20px;display:grid;place-items:center}
@@ -211,16 +213,31 @@ details.adv summary{cursor:pointer;font-weight:600;color:var(--muted)}
 /* ---- aesthetic layer ---- */
 body{background:
   radial-gradient(900px 520px at 88% -8%, color-mix(in srgb,var(--accent) 14%,transparent), transparent 62%),
-  radial-gradient(760px 480px at -8% 108%, color-mix(in srgb,var(--saffron) 16%,transparent), transparent 60%),
-  var(--bg);background-attachment:fixed}
+  radial-gradient(760px 480px at -8% 108%, color-mix(in srgb,var(--rani) 12%,transparent), transparent 60%),
+  var(--bg);background-attachment:fixed;font-synthesis:style;overflow-x:clip}
+#bgfx{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none}
+h1,h2{font-weight:400!important;letter-spacing:0}
+h1{line-height:1.02}
+.toran{position:absolute;left:0;right:0;top:100%;height:44px;pointer-events:none;filter:drop-shadow(0 3px 3px rgba(80,30,0,.2));
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='44' viewBox='0 0 72 44'%3E%3Cpath d='M0 3 Q36 22 72 3' fill='none' stroke='%237a3e12' stroke-width='1.2'/%3E%3Cpath d='M36 15 C41.5 22 40.5 32 36 40 C31.5 32 30.5 22 36 15Z' fill='%232f7d32'/%3E%3Cpath d='M36 17 L36 38' stroke='%2381c784' stroke-width='.7'/%3E%3Cg%3E%3Ccircle cx='0' cy='3' r='5.4' fill='%23f97316'/%3E%3Ccircle cx='0' cy='3' r='3.7' fill='none' stroke='%23fdba74' stroke-width='1.6' stroke-dasharray='1.2 1.1'/%3E%3Ccircle cx='0' cy='3' r='1.4' fill='%23c2410c'/%3E%3C/g%3E%3Cg%3E%3Ccircle cx='72' cy='3' r='5.4' fill='%23f97316'/%3E%3Ccircle cx='72' cy='3' r='3.7' fill='none' stroke='%23fdba74' stroke-width='1.6' stroke-dasharray='1.2 1.1'/%3E%3Ccircle cx='72' cy='3' r='1.4' fill='%23c2410c'/%3E%3C/g%3E%3Cg%3E%3Ccircle cx='12' cy='8.3' r='5.4' fill='%23fbbf24'/%3E%3Ccircle cx='12' cy='8.3' r='3.7' fill='none' stroke='%23fde68a' stroke-width='1.6' stroke-dasharray='1.2 1.1'/%3E%3Ccircle cx='12' cy='8.3' r='1.4' fill='%23d97706'/%3E%3C/g%3E%3Cg%3E%3Ccircle cx='24' cy='11.4' r='5.4' fill='%23f97316'/%3E%3Ccircle cx='24' cy='11.4' r='3.7' fill='none' stroke='%23fdba74' stroke-width='1.6' stroke-dasharray='1.2 1.1'/%3E%3Ccircle cx='24' cy='11.4' r='1.4' fill='%23c2410c'/%3E%3C/g%3E%3Cg%3E%3Ccircle cx='36' cy='12.5' r='5.4' fill='%23fbbf24'/%3E%3Ccircle cx='36' cy='12.5' r='3.7' fill='none' stroke='%23fde68a' stroke-width='1.6' stroke-dasharray='1.2 1.1'/%3E%3Ccircle cx='36' cy='12.5' r='1.4' fill='%23d97706'/%3E%3C/g%3E%3Cg%3E%3Ccircle cx='48' cy='11.4' r='5.4' fill='%23f97316'/%3E%3Ccircle cx='48' cy='11.4' r='3.7' fill='none' stroke='%23fdba74' stroke-width='1.6' stroke-dasharray='1.2 1.1'/%3E%3Ccircle cx='48' cy='11.4' r='1.4' fill='%23c2410c'/%3E%3C/g%3E%3Cg%3E%3Ccircle cx='60' cy='8.3' r='5.4' fill='%23fbbf24'/%3E%3Ccircle cx='60' cy='8.3' r='3.7' fill='none' stroke='%23fde68a' stroke-width='1.6' stroke-dasharray='1.2 1.1'/%3E%3Ccircle cx='60' cy='8.3' r='1.4' fill='%23d97706'/%3E%3C/g%3E%3C/svg%3E") repeat-x 0 0/72px 44px}
+.one{padding-top:76px}.res{padding-top:76px}
 header.top{background:color-mix(in srgb,var(--bg) 72%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom-color:color-mix(in srgb,var(--line) 70%,transparent)}
 .btn{transition:transform .18s ease,box-shadow .18s ease,background .18s ease}
-.btn.primary{box-shadow:0 10px 24px -12px color-mix(in srgb,var(--accent) 80%,transparent)}
+.btn.primary{background:linear-gradient(120deg,var(--accent),var(--rani));border-color:transparent;box-shadow:0 10px 24px -12px color-mix(in srgb,var(--rani) 80%,transparent)}
 .btn.primary:hover{transform:translateY(-2px);box-shadow:0 16px 30px -14px color-mix(in srgb,var(--accent) 90%,transparent)}
 .btn.big{border-radius:999px;padding:15px 26px}
 .card,.ticket,.bigdrop{box-shadow:0 1px 2px rgba(40,15,8,.04),0 12px 32px -20px rgba(40,15,8,.22)}
-.hero{grid-template-columns:1fr 1fr;gap:28px;padding:56px 0 64px}
-.hero h1 .hl{color:var(--accent);font-style:italic}
+.hero{grid-template-columns:1fr 1fr;gap:28px;padding:84px 0 56px}
+.hero h1 .hl{background:linear-gradient(100deg,var(--accent),var(--rani) 70%);-webkit-background-clip:text;background-clip:text;color:transparent;font-style:italic;padding-right:.12em}
+.dvx{font:400 1.08rem var(--dev);letter-spacing:0;text-transform:none;color:var(--rani)}
+.marq{margin:0 calc(50% - 50vw);overflow:hidden;border-block:1px solid var(--line);background:color-mix(in srgb,var(--surface) 55%,transparent);backdrop-filter:blur(6px);padding:12px 0;margin-bottom:56px}
+.marq .tr{display:flex;width:max-content;animation:marq 50s linear infinite}
+.marq .g{display:flex}
+.marq span{display:inline-flex;align-items:baseline;gap:10px;padding:0 20px;white-space:nowrap}
+.marq .dv{font:400 1.55rem var(--dev);color:var(--accent)}
+.marq .en{font:600 .72rem var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.marq i{font-style:normal;color:var(--saffron);margin-left:14px}
+@keyframes marq{to{transform:translateX(-50%)}}
 .fade{opacity:0;transform:translateY(14px);animation:fadeUp .7s cubic-bezier(.2,.7,.2,1) forwards}
 .fade:nth-child(2){animation-delay:.08s}.fade:nth-child(3){animation-delay:.16s}.fade:nth-child(4){animation-delay:.24s}.fade:nth-child(5){animation-delay:.32s}
 @keyframes fadeUp{to{opacity:1;transform:none}}
@@ -233,26 +250,28 @@ header.top{background:color-mix(in srgb,var(--bg) 72%,transparent);backdrop-filt
 .stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab;touch-action:pan-y}
 .stage canvas:active{cursor:grabbing}
 .stage .plate{top:50%;width:52%;box-shadow:0 24px 40px -24px rgba(60,20,10,.5)}
-.stage.live .plate{display:none}
+.stage.live .plate,.stage.live::before{display:none}
 .chip{position:absolute;left:4%;bottom:3%;z-index:2;max-width:250px;padding:12px 16px;border-radius:18px;
   background:color-mix(in srgb,var(--surface) 72%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
   border:1px solid color-mix(in srgb,var(--line) 80%,transparent);box-shadow:0 18px 40px -24px rgba(40,15,8,.45);
   animation:floaty 6s ease-in-out infinite}
 .chip span{display:block;font:600 .7rem var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
-.chip strong{display:block;font:800 1.08rem/1.15 var(--display);margin:3px 0}
+.chip strong{display:block;font:400 1.2rem/1.15 var(--display);margin:3px 0}
 .chip em{font-style:normal;font-size:.82rem;color:var(--muted)}
 @keyframes floaty{50%{transform:translateY(-8px)}}
-@media (prefers-reduced-motion:reduce){.fade{animation:none;opacity:1;transform:none}.chip{animation:none}}
-@media (max-width:860px){.hero{grid-template-columns:1fr;padding-top:28px}.stage{max-width:420px}.chip{display:none}}
+@media (prefers-reduced-motion:reduce){.fade{animation:none;opacity:1;transform:none}.chip,.marq .tr,.brand i{animation:none}}
+@media (max-width:860px){.hero{grid-template-columns:1fr;padding-top:64px}.stage{max-width:420px}.chip{display:none}}
 </style>
 </head>
 <body>
+<canvas id="bgfx" aria-hidden="true"></canvas>
 <header class="top">
   <div class="wrap">
     <a class="brand" href="#home"><i aria-hidden="true"></i>PlateReel</a>
     <nav class="steps" id="nav" aria-label="Campaign steps"></nav>
   </div>
   <div id="demoflag"></div>
+  <div class="toran" aria-hidden="true"></div>
 </header>
 <main id="app" class="wrap"></main>
 <footer><div class="wrap">PlateReel · hackathon build. API keys stay on the server or in your notebook's secrets manager. This page never asks for one.</div></footer>
@@ -298,7 +317,7 @@ const hn = s=>String(s??'').toLowerCase().replace(/[_\-]+/g,' ').replace(/\s+/g,
 const dn = s=>String(s??'').toLowerCase().replace(/[^a-z0-9]+/g,'');
 const fnm = s=>dn(String(s??'').replace(/\.[a-z0-9]{2,5}$/i,''));
 const kb = n=>n<1024?n+' B':n<1048576?(n/1024).toFixed(1)+' KB':(n/1048576).toFixed(1)+' MB';
-const money = p=>{const t=String(p??'').trim(); if(!t) return ''; return /^[0-9]+([.,][0-9]+)?$/.test(t)?'$'+t:t;};
+const money = p=>{const t=String(p??'').trim(); if(!t) return ''; return /^[0-9]+([.,][0-9]+)?$/.test(t)?'₹'+t:t;};
 function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),2400);}
 async function copyText(text,what){
   try{ await navigator.clipboard.writeText(text); toast(what+' copied'); }
@@ -616,7 +635,7 @@ function loadVideoFile(f){
 }
 
 /* ---------- demo mode ---------- */
-const DEMO_MENU=[['Smoked Brisket Plate','18.50','Mains','brisket.jpg','#7a3b1e'],['Fried Catfish Basket','14.00','Mains','catfish.jpg','#c9892b'],['Shrimp and Grits','16.00','Mains','shrimp_grits.jpg','#e3b56a'],['Pimento Cheese Burger','13.50','Mains','burger.jpg','#a8462a'],['Collard Greens','4.50','Sides','collards.jpg','#3f6b3a'],['Mac and Cheese','5.00','Sides','mac.jpg','#e0a52e'],['Fried Green Tomatoes','7.50','Starters','fgt.jpg','#8a9a3a'],['Peach Cobbler','6.50','Desserts','cobbler.jpg','#d9772f'],['Banana Pudding','6.00','Desserts','banana_pudding.jpg','#e8cf7a']];
+const DEMO_MENU=[['Butter Chicken','320','Mains','butter_chicken.jpg','#c4501f'],['Paneer Tikka','260','Starters','paneer_tikka.jpg','#e08a2c'],['Masala Dosa','140','Mains','masala_dosa.jpg','#d9a441'],['Chole Bhature','180','Mains','chole_bhature.jpg','#a8642a'],['Dal Makhani','220','Mains','dal_makhani.jpg','#6b2f1a'],['Jeera Rice','120','Sides','jeera_rice.jpg','#efe3c4'],['Punjabi Samosa','40','Starters','samosa.jpg','#c98a35'],['Gulab Jamun','90','Desserts','gulab_jamun.jpg','#7a2e14'],['Masala Chai','30','Drinks','masala_chai.jpg','#b9814f']];
 const DEMO_QTY=[[22,18,25,30,41,48,36],[14,12,15,19,33,35,24],[9,8,11,12,20,24,15],[17,13,16,21,29,34,22],[11,9,10,14,19,23,16],[19,15,18,22,31,37,25],[2,1,3,2,4,5,3],[8,6,9,10,16,19,12],[10,7,9,12,17,20,14]];
 async function loadDemo(){
   if(S.busy.demo) return; S.busy.demo=true; render();
@@ -651,19 +670,23 @@ function renderNav(){
 function msgs(o){return (o.e.length?`<div class="note bad" role="alert"><ul class="msgs">${o.e.map(m=>`<li>${esc(m)}</li>`).join('')}</ul></div>`:'')+(o.w.length?`<div class="note warn"><ul class="msgs">${o.w.map(m=>`<li>${esc(m)}</li>`).join('')}</ul></div>`:'');}
 
 function viewHome(){
+  const dishes=[['समोसा','Samosa'],['जलेबी','Jalebi'],['थाली','Thali'],['मसाला चाय','Masala chai'],['लड्डू','Laddoo'],['डोसा','Dosa'],['बिरयानी','Biryani'],['पनीर टिक्का','Paneer tikka'],['गुलाब जामुन','Gulab jamun'],['पाव भाजी','Pav bhaji']];
+  const strip=dishes.map(([h,e])=>`<span><b class="dv" lang="hi">${h}</b><b class="en">${e}</b><i aria-hidden="true">✺</i></span>`).join('');
   return `<section class="hero">
     <div class="stack" style="gap:22px">
-      <h1 class="fade">Turn last week’s sales into <span class="hl">this week’s video.</span></h1>
+      <span class="eyebrow fade"><span class="dvx" lang="hi">स्वाद से सोशल तक</span> · from taste to social</span>
+      <h1 class="fade">Turn last week’s sales into <span class="hl">this week’s reel.</span></h1>
       <p class="lead fade">Add your menu, sales and dish photos. PlateReel picks a dish to promote, writes the post and builds a short vertical video.</p>
       <div class="fade"><a class="btn primary big" href="#assets">Create a campaign</a></div>
       <ol class="steps3 fade"><li><b>1</b>Add files</li><li><b>2</b>Review recommendation</li><li><b>3</b>Get your campaign</li></ol>
       <p class="muted fade" style="font-size:.88rem">No files handy? <button class="linkish" data-act="demo" ${S.busy.demo?'disabled':''}>${S.busy.demo?'Loading sample…':'Try it with sample data'}</button></p>
     </div>
-    <div class="stage ${Food.canvas?'live':''}" id="stage" role="img" aria-label="Animated 3D burger, donut, pizza slice, cherry and macaron floating over a plate">
+    <div class="stage ${Food.canvas?'live':''}" id="stage" role="img" aria-label="Animated 3D steel thali, samosa, jalebi, laddoo and kulhad chai floating in front of a turning mandala">
       <div class="plate"></div>
-      <div class="chip"><span>Example post</span><strong>Crispy, tangy, gone by Friday.</strong><em>Fried Green Tomatoes · $7.50</em></div>
+      <div class="chip"><span>Example post</span><strong>Crispy, flaky, gone by Friday.</strong><em>Punjabi Samosa · ₹40</em></div>
     </div>
-  </section>`;
+  </section>
+  <section class="marq" aria-label="Dishes"><div class="tr"><div class="g">${strip}</div><div class="g" aria-hidden="true">${strip}</div></div></section>`;
 }
 
 function viewAssets(){
@@ -799,60 +822,95 @@ function initFood(){
   r.setPixelRatio(Math.min(2,window.devicePixelRatio||1)); r.outputEncoding=T.sRGBEncoding;
   const still=matchMedia('(prefers-reduced-motion: reduce)').matches;
   const scene=new T.Scene(), cam=new T.PerspectiveCamera(35,1,.1,100);
-  scene.add(new T.HemisphereLight(0xfff6ef,0xb98a7a,.62));
-  const key=new T.DirectionalLight(0xfff1e6,.95); key.position.set(4,7,6); scene.add(key);
-  const rim=new T.DirectionalLight(0xffc9a0,.7); rim.position.set(-6,-1,-5); scene.add(rim);
+
+  // a small warm "room" for reflections, so the steel thali shines
+  const pm=new T.PMREMGenerator(r), env=new T.Scene();
+  env.add(new T.Mesh(new T.SphereGeometry(10,32,16),new T.MeshBasicMaterial({color:0x9a7a70,side:T.BackSide})));
+  [[0xffffff,[0,8,3],[9,4]],[0xffa64d,[-8,2,3],[4,7]],[0xff5c9a,[8,1,-2],[3,6]],[0xfff1d6,[0,-1,9],[12,3]],[0x43c6c0,[0,-8,-3],[6,3]]]
+    .forEach(([c,p,s])=>{const m=new T.Mesh(new T.PlaneGeometry(...s),new T.MeshBasicMaterial({color:c,side:T.DoubleSide})); m.position.set(...p); m.lookAt(0,0,0); env.add(m);});
+  scene.environment=pm.fromScene(env,.04).texture;
+
+  scene.add(new T.HemisphereLight(0xfff3e6,0x8a5a4a,.45));
+  const key=new T.DirectionalLight(0xfff0dd,.9); key.position.set(4,7,6); scene.add(key);
+  const rim=new T.DirectionalLight(0xff9ec4,.55); rim.position.set(-6,-1,-5); scene.add(rim);
+
   let seed=11; const rnd=()=>(seed=seed*16807%2147483647)/2147483647;
-  const M=(c,ro=.55)=>new T.MeshStandardMaterial({color:c,roughness:ro,metalness:0});
+  const M=(c,ro=.6,ex={})=>new T.MeshStandardMaterial({color:c,roughness:ro,metalness:0,...ex});
   const mk=(g,m,p,rt,s)=>{const o=new T.Mesh(g,m); if(p)o.position.set(...p); if(rt)o.rotation.set(...rt); if(s)o.scale.set(...s); return o;};
   const grp=(...k)=>{const g=new T.Group(); k.forEach(x=>g.add(x)); return g;};
+  const bump=(g,amt,f)=>{const p=g.attributes.position; for(let i=0;i<p.count;i++){const x=p.getX(i),y=p.getY(i),z=p.getZ(i),n=Math.sin(x*f)*Math.sin(y*f*1.13+1)*Math.sin(z*f*.91+2); const k=1+amt*n; p.setXYZ(i,x*k,y*k,z*k);} g.computeVertexNormals(); return g;};
 
-  // burger
-  const bun=M(0xE9A04B,.5), burger=grp(
-    mk(new T.CylinderGeometry(1.32,1.22,.42,48),bun,[0,-.86,0]),
-    mk(new T.CylinderGeometry(1.46,1.46,.42,48),M(0x6B3A22,.85),[0,-.44,0]),
-    mk(new T.BoxGeometry(2.5,.07,2.5),M(0xF9C846,.4),[0,-.2,0],[0,Math.PI/4,0]),
-    mk(new T.CylinderGeometry(1.3,1.3,.14,48),M(0xE5533C,.45),[0,-.08,0]),
-    mk(new T.CylinderGeometry(1.55,1.5,.1,13),M(0x7CC36B,.6),[0,.04,0]),
-    mk(new T.SphereGeometry(1.4,48,24,0,Math.PI*2,0,Math.PI/2),bun,[0,.08,0],null,[1,.8,1]));
-  const seedM=M(0xFFF3D6,.4);
-  for(let i=0;i<16;i++){ const th=rnd()*Math.PI*2, ph=.25+rnd()*.85;
-    burger.add(mk(new T.SphereGeometry(.06,8,6),seedM,[Math.sin(ph)*Math.cos(th)*1.4,.08+Math.cos(ph)*1.12,Math.sin(ph)*Math.sin(th)*1.4],[rnd()*3,rnd()*3,0],[1,.5,1.9])); }
+  // the mandala sun behind everything (shader)
+  const sunMat=new T.ShaderMaterial({transparent:true,depthWrite:false,premultipliedAlpha:true,uniforms:{uT:{value:0}},
+    vertexShader:`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+    fragmentShader:`varying vec2 vUv;uniform float uT;
+      float ring(float d,float w){return smoothstep(w,0.,abs(d));}
+      void main(){
+        vec2 p=(vUv-.5)*2.;float r=length(p),a=atan(p.y,p.x),rot=uT*.07,w=.007;
+        vec3 glow=mix(vec3(1.,.66,.22),vec3(.93,.24,.46),smoothstep(.05,.95,r));
+        float g=smoothstep(.98,.0,r)*.62;
+        vec3 col=glow*g;float al=g;
+        float m=ring(r-(.56+.08*abs(cos((a+rot)*8.))),w);col+=vec3(1.,.88,.45)*m;al+=m;
+        m=ring(r-(.74+.045*abs(cos((a-rot)*16.))),w);col+=vec3(1.,.5,.66)*m*.85;al+=m*.85;
+        float seg=6.28318/32.,aa=mod(a+rot*.5+seg*.5,seg)-seg*.5;
+        m=smoothstep(.022,.013,length(vec2(r-.85,aa*.85)));col+=vec3(1.,.82,.32)*m;al+=m;
+        m=ring(r-.92,w*.8)+ring(r-.43,w*.8);col+=vec3(1.,.93,.75)*m*.6;al+=m*.6;
+        float seg2=6.28318/8.,ab=mod(a-rot*.6+seg2*.5,seg2)-seg2*.5;
+        m=ring(length(vec2(r-.30,ab*.30)*vec2(1.,1.7))-.08,w);col+=vec3(1.,.9,.6)*m*.7;al+=m*.7;
+        float rays=pow(abs(cos((a+rot*.3)*12.)),60.)*smoothstep(.98,.6,r)*smoothstep(.45,.6,r)*.3;col+=vec3(1.,.92,.7)*rays;al+=rays;
+        float e=smoothstep(1.,.93,r);
+        gl_FragColor=vec4(col*e,clamp(al,0.,1.)*e);
+      }`});
+  const sun=mk(new T.PlaneGeometry(9.6,9.6),sunMat,[0,0,-3.5]); scene.add(sun);
 
-  // donut
-  const donut=grp(
-    mk(new T.TorusGeometry(.75,.36,24,56),M(0xE3A86B,.6)),
-    mk(new T.TorusGeometry(.76,.335,24,56),M(0xF7A1BE,.35),[0,0,.13],null,[1,1,.62]));
-  const spr=[0xFFFFFF,0x7FC8F8,0xFFD166,0x9BE39B,0xB78CF2];
-  for(let i=0;i<26;i++){ const u=rnd()*Math.PI*2, v=.5+rnd()*2.1, R=.76+.34*Math.cos(v);
-    donut.add(mk(new T.CylinderGeometry(.028,.028,.16,6),M(spr[i%spr.length],.4),[R*Math.cos(u),R*Math.sin(u),.15+.34*.62*Math.sin(v)],[rnd()*3,rnd()*3,rnd()*3])); }
+  // steel thali with katoris, rice and roti
+  const steel=new T.MeshStandardMaterial({color:0xf2f3f5,metalness:.85,roughness:.18});
+  const thali=grp(mk(new T.CylinderGeometry(2,1.85,.1,72),steel),mk(new T.TorusGeometry(1.98,.07,12,80),steel,[0,.06,0],[Math.PI/2,0,0]));
+  const katori=(x,z,food,ro)=>{const g=grp(
+      mk(new T.CylinderGeometry(.5,.38,.34,40),steel,[0,.22,0]),
+      mk(new T.TorusGeometry(.5,.035,10,40),steel,[0,.39,0],[Math.PI/2,0,0]),
+      mk(new T.CylinderGeometry(.47,.47,.03,40),M(food,ro),[0,.405,0]));
+    g.position.set(x,0,z); thali.add(g); return g;};
+  katori(-1.15,-.85,0xE9A23B,.35);                       // dal
+  const cur=katori(0,-1.38,0xC4421F,.3);                  // curry
+  katori(1.15,-.85,0x6F8F2F,.55);                        // sabzi
+  const rai=katori(1.38,.42,0xF6F0E0,.5);                 // raita
+  [[.1,.1],[-.15,.05],[.05,-.17]].forEach(([x,z])=>rai.add(mk(new T.SphereGeometry(.035,8,6),M(0x3f8f3a),[x,.425,z],null,[1,.4,1])));
+  cur.add(mk(new T.SphereGeometry(.09,12,8),M(0xF7F2E6,.5),[.12,.43,.05],null,[1,.35,1])); // cream swirl
+  const rice=mk(new T.SphereGeometry(.66,40,20,0,Math.PI*2,0,Math.PI/2),M(0xFBF7EE,.95),[-.4,.05,.5],null,[1,.55,1]);
+  bump(rice.geometry,.03,30); thali.add(rice);
+  for(let i=0;i<6;i++) thali.add(mk(new T.SphereGeometry(.045,8,6),M(0x3f8f3a),[-.4+(rnd()-.5)*.6,.36,.5+(rnd()-.5)*.5],null,[1,.35,1]));
+  const roti=grp(mk(new T.CylinderGeometry(.74,.74,.05,48),M(0xDDA866,.85)));
+  for(let i=0;i<9;i++){const a=rnd()*6.28,d=rnd()*.58; roti.add(mk(new T.SphereGeometry(.07+rnd()*.05,10,6),M(0x8a4d1f,.9),[Math.cos(a)*d,.03,Math.sin(a)*d],null,[1,.12,1]));}
+  roti.position.set(.62,.22,.95); roti.rotation.set(-.38,0,.12); thali.add(roti);
+  const chili=grp(mk(new T.CylinderGeometry(.055,.045,.62,12),M(0x2f8a2a,.35),null,[0,0,Math.PI/2]),mk(new T.ConeGeometry(.045,.16,12),M(0x2f8a2a,.35),[.39,0,0],[0,0,-Math.PI/2]));
+  chili.position.set(-1.35,.1,.55); chili.rotation.y=.7; thali.add(chili);
 
-  // pizza slice
-  const sh=new T.Shape(); sh.moveTo(0,-1.1); sh.lineTo(.86,.8); sh.quadraticCurveTo(0,1.02,-.86,.8); sh.lineTo(0,-1.1);
-  const sg=new T.ExtrudeGeometry(sh,{depth:.12,bevelEnabled:true,bevelThickness:.04,bevelSize:.04,bevelSegments:3}); sg.translate(0,.05,-.06);
-  const pizza=grp(mk(sg,M(0xF6C453,.5)),
-    mk(new T.CylinderGeometry(.15,.15,1.86,20),M(0xD98C3E,.6),[0,.9,0],[0,0,Math.PI/2]));
-  [[0,.32],[-.3,.58],[.3,.6],[.04,-.3]].forEach(([x,y])=>pizza.add(mk(new T.CylinderGeometry(.16,.16,.04,24),M(0xC0392B,.5),[x,y,.13],[Math.PI/2,0,0])));
+  // samosa
+  const samosa=grp(mk(bump(new T.ConeGeometry(.74,1.15,3,8),.05,9),M(0xD48A33,.72)));
+  for(let i=0;i<14;i++){const a=rnd()*6.28,h=rnd()*.9-.5; samosa.add(mk(new T.SphereGeometry(.03,6,4),M(0x7a3d10),[Math.cos(a)*.38*(.55-h*.6),h,Math.sin(a)*.38*(.55-h*.6)]));}
 
-  // cherry
-  const cherry=grp(
-    mk(new T.SphereGeometry(.44,32,24),M(0xD7263D,.25)),
-    mk(new T.CylinderGeometry(.025,.03,.75,8),M(0x5B7A2E,.7),[.1,.68,0],[0,0,-.28]),
-    mk(new T.SphereGeometry(.2,16,10),M(0x6FB45A,.6),[.32,.95,0],[0,0,.6],[1,.22,.5]));
+  // jalebi spiral
+  const pts=[]; for(let i=0;i<=180;i++){const t=i/180,an=t*Math.PI*2*2.75,rr=.07+.62*t; pts.push(new T.Vector3(rr*Math.cos(an),rr*Math.sin(an),Math.sin(t*44)*.035));}
+  const jalebi=grp(mk(new T.TubeGeometry(new T.CatmullRomCurve3(pts),360,.085,12,false),M(0xF07E10,.15,{emissive:0x6a1d00,emissiveIntensity:.35})));
 
-  // macaron
-  const shell=M(0x9FD9C2,.6), macaron=grp(
-    mk(new T.SphereGeometry(.62,32,16),shell,[0,.2,0],null,[1,.36,1]),
-    mk(new T.CylinderGeometry(.55,.55,.2,32),M(0xFFF1E0,.5)),
-    mk(new T.SphereGeometry(.62,32,16),shell,[0,-.2,0],null,[1,.36,1]));
+  // laddoo (boondi bumps) with a silver leaf flake
+  const ladoo=grp(mk(bump(new T.SphereGeometry(.54,72,48),.05,24),M(0xF2A01E,.8)),
+    mk(new T.CircleGeometry(.16,6),new T.MeshStandardMaterial({color:0xf2f2f2,metalness:1,roughness:.3,side:T.DoubleSide}),[.1,.5,.18],[-1.1,0,.3]));
+
+  // kulhad chai with steam
+  const clay=new T.MeshStandardMaterial({color:0xB0532C,roughness:.92,side:T.DoubleSide});
+  const kulhad=grp(mk(new T.CylinderGeometry(.5,.36,.8,40,1,true),clay),mk(new T.CircleGeometry(.36,40),clay,[0,-.4,0],[Math.PI/2,0,0]),
+    mk(new T.TorusGeometry(.5,.04,10,40),clay,[0,.4,0],[Math.PI/2,0,0]),mk(new T.CircleGeometry(.47,40),M(0xC4895A,.25),[0,.3,0],[-Math.PI/2,0,0]));
+  const steam=[0,1,2,3].map(()=>{const s=mk(new T.SphereGeometry(.14,16,12),new T.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0,depthWrite:false})); kulhad.add(s); return s;});
 
   // [object, position, scale, tilt, spin: 'turn' = full turn, number = sway]
-  const items=[[burger,[0,-.15,0],1.2,[.42,0,0],'turn'],[donut,[-2.65,2.05,-1],1,[-.25,.3,.2],.6],
-    [cherry,[2.75,2.25,-.6],1,[.1,0,0],'turn'],[macaron,[-3.25,-.4,.2],1,[.5,0,.2],'turn'],[pizza,[2.6,-2.1,0],.95,[-.45,-.2,.35],.5]]
+  const items=[[thali,[0,-.35,0],1.05,[.62,0,0],'turn'],[samosa,[-2.85,2.0,-.8],1.1,[.45,0,-.18],'turn'],
+    [jalebi,[2.85,2.1,-.6],1,[-.15,.2,.15],.6],[ladoo,[-3.25,-.4,.2],1,[0,0,0],'turn'],[kulhad,[2.85,-1.85,.3],1.35,[.42,0,-.1],.45]]
     .map(([o,p,s,rt,sp],i)=>{const outer=grp(o); outer.position.set(...p); outer.rotation.set(...rt); scene.add(outer);
-      return {o,outer,p,s,sp,ph:i*1.3,delay:i*.12};});
+      return {o,outer,p,s,sp,ph:i*1.3,delay:.1+i*.12};});
 
-  const ptr={x:0,y:0,tx:0,ty:0}; let drag=null, vel=.35, ang=0;
+  const ptr={x:0,y:0,tx:0,ty:0}; let drag=null, vel=.3, ang=0;
   addEventListener('pointermove',e=>{ if(!Food.canvas.isConnected) return; const b=Food.canvas.getBoundingClientRect();
     ptr.tx=Math.max(-1,Math.min(1,((e.clientX-b.left)/b.width-.5)*2)); ptr.ty=Math.max(-1,Math.min(1,((e.clientY-b.top)/b.height-.5)*2));
     if(drag!==null){ vel=(e.clientX-drag)*.02; drag=e.clientX; } });
@@ -864,12 +922,15 @@ function initFood(){
   function draw(now){
     const t=still?10:(now-(t0??=now))/1000, dt=Math.min(.05,(now-last)/1000||0); last=now;
     ptr.x+=(ptr.tx-ptr.x)*.05; ptr.y+=(ptr.ty-ptr.y)*.05;
-    if(drag===null) vel+=(.35-vel)*.02; ang+=vel*dt;
+    if(drag===null) vel+=(.3-vel)*.02; ang+=vel*dt;
+    sunMat.uniforms.uT.value=t; sun.position.set(-ptr.x*.15,ptr.y*.1,-3.5);
+    const sk=ease(t/1.1); sun.scale.setScalar(Math.max(.001,sk));
     items.forEach(it=>{ const k=ease((t-it.delay)/.9)*it.s, bob=still?0:Math.sin(t*1.1+it.ph)*.16;
       it.outer.scale.setScalar(Math.max(.001,k));
       it.outer.position.set(it.p[0]+ptr.x*.25*(1+it.p[2]*.3), it.p[1]+bob-ptr.y*.2, it.p[2]);
-      it.o.rotation.y = it.sp==='turn' ? (it.o===burger?ang:t*.5+it.ph) : Math.sin(t*it.sp+it.ph)*.55;
+      it.o.rotation.y = it.sp==='turn' ? (it.o===thali?ang:t*.5+it.ph) : Math.sin(t*it.sp+it.ph)*.55;
       it.o.rotation.x = ptr.y*.15; });
+    steam.forEach((s,i)=>{ const ph=(t*.35+i/steam.length)%1; s.position.set(Math.sin(ph*6+i)*.12,.45+ph*1.1,0); s.scale.setScalar(.6+ph*1.4); s.material.opacity=still?0:Math.sin(ph*Math.PI)*.28; });
     r.render(scene,cam);
   }
   function loop(now){ if(!r.domElement.isConnected){ Food.raf=0; return; } Food.raf=requestAnimationFrame(loop); if(!document.hidden) draw(now); }
@@ -880,6 +941,52 @@ function initFood(){
   mountFood();
 }
 (()=>{ const s=document.createElement('script'); s.src='https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js'; s.onload=initFood; document.head.appendChild(s); })();
+
+/* ---------- rangoli background shader: two slow mandalas peeking from the corners ---------- */
+(()=>{
+  const cv=$('#bgfx'); const gl=cv&&cv.getContext('webgl',{alpha:true,premultipliedAlpha:true,antialias:false}); if(!gl) return;
+  const sh=(type,src)=>{const s=gl.createShader(type); gl.shaderSource(s,src); gl.compileShader(s); return gl.getShaderParameter(s,gl.COMPILE_STATUS)?s:null;};
+  const vs=sh(gl.VERTEX_SHADER,'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}');
+  const fs=sh(gl.FRAGMENT_SHADER,`precision mediump float;uniform vec2 R;uniform float T;uniform float K;
+    const vec3 SAF=vec3(.95,.45,.07),GOLD=vec3(.98,.72,.12),RANI=vec3(.80,.10,.40),PEA=vec3(.05,.52,.52);
+    float ln(float d,float w){return smoothstep(w,0.,abs(d));}
+    vec4 mandala(vec2 p,float s,float rot){
+      p/=s;float r=length(p),a=atan(p.y,p.x)+rot,w=1.6/(R.y*s);
+      vec3 c=vec3(0.);float al=0.,m;
+      m=ln(r-(.10+.05*abs(cos(a*4.))),w);c+=RANI*m;al+=m;
+      m=ln(r-.20,w)+ln(r-.215,w*.7);c+=PEA*m;al+=m;
+      m=ln(r-(.30+.10*abs(cos(a*6.))),w);c+=SAF*m;al+=m;
+      m=ln(r-(.30+.10*abs(cos(a*6.+1.5708))),w);c+=GOLD*m*.8;al+=m*.8;
+      m=ln(r-(.47+.05*abs(cos(a*12.))),w);c+=RANI*m;al+=m;
+      float sg=6.28318/24.,aa=mod(a+sg*.5,sg)-sg*.5;
+      m=smoothstep(.02,.012,length(vec2(r-.57,aa*.57)));c+=GOLD*m;al+=m;
+      m=ln(r-.64,w)+ln(r-.67,w*.7);c+=PEA*m;al+=m;
+      float s8=6.28318/12.,ab=mod(a-rot*2.+s8*.5,s8)-s8*.5;
+      m=ln(length(vec2(r-.82,ab*.82)*vec2(1.,1.5))-.13,w);c+=SAF*m;al+=m;
+      m=smoothstep(.016,.009,length(vec2(r-.82,ab*.82)));c+=RANI*m;al+=m;
+      m=ln(r-.98,w);c+=GOLD*m*.7;al+=m*.7;
+      float f=smoothstep(1.05,.9,r);
+      return vec4(c,min(al,1.))*f;
+    }
+    void main(){
+      vec2 uv=(gl_FragCoord.xy-.5*R)/R.y;float asp=R.x/R.y;
+      vec4 m=mandala(uv-vec2(.5*asp+.02,.5+.02),.62,T*.02)+mandala(uv-vec2(-.5*asp-.04,-.5-.04),.52,-T*.025);
+      m.a=min(m.a,1.);gl_FragColor=m*K;
+    }`);
+  if(!vs||!fs) return;
+  const pr=gl.createProgram(); gl.attachShader(pr,vs); gl.attachShader(pr,fs); gl.linkProgram(pr); if(!gl.getProgramParameter(pr,gl.LINK_STATUS)) return;
+  gl.useProgram(pr); gl.bindBuffer(gl.ARRAY_BUFFER,gl.createBuffer()); gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
+  const loc=gl.getAttribLocation(pr,'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
+  const uR=gl.getUniformLocation(pr,'R'),uT=gl.getUniformLocation(pr,'T'),uK=gl.getUniformLocation(pr,'K');
+  const still=matchMedia('(prefers-reduced-motion: reduce)').matches, darkQ=matchMedia('(prefers-color-scheme: dark)');
+  const isDark=()=>{const t=document.documentElement.dataset.theme; return t?t==='dark':darkQ.matches;};
+  const size=()=>{const d=Math.min(1.5,window.devicePixelRatio||1); cv.width=Math.round(innerWidth*d); cv.height=Math.round(innerHeight*d); gl.viewport(0,0,cv.width,cv.height);};
+  let last=0;
+  const draw=now=>{ gl.uniform2f(uR,cv.width,cv.height); gl.uniform1f(uT,still?0:now/1000); gl.uniform1f(uK,isDark()?.42:.36); gl.clearColor(0,0,0,0); gl.clear(gl.COLOR_BUFFER_BIT); gl.drawArrays(gl.TRIANGLES,0,3); };
+  size(); addEventListener('resize',()=>{size(); draw(performance.now());}); darkQ.addEventListener&&darkQ.addEventListener('change',()=>draw(performance.now()));
+  if(still) return draw(0);
+  (function loop(now){ requestAnimationFrame(loop); if(document.hidden||now-last<33) return; last=now; draw(now); })(0);
+})();
 
 /* ---------- events ---------- */
 document.addEventListener('click',e=>{
