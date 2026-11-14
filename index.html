@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PlateReel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: a kitchen pass. Left = paperwork (tickets, CSV rows in mono), right = the plate (9:16 phone frame). */
+:root{
+  --bg:#F5F2F1; --surface:#FFFFFF; --ink:#201613; --muted:#6B5E59; --line:#E2DBD7;
+  --accent:#D7381C; --accent-ink:#FFFFFF; --soft:#FBE7E1; --saffron:#F3B02A;
+  --good:#256F49; --warn:#8F5600; --bad:#B3261E; --good-soft:#E1F1E8; --warn-soft:#FBEFD6; --bad-soft:#FBE4E2;
+  --display:"Bricolage Grotesque","Arial Narrow",system-ui,sans-serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  --r:14px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#17110F; --surface:#221916; --ink:#F6EEEA; --muted:#B5A69F; --line:#3B2E29;
+    --accent:#FF6B4A; --accent-ink:#1E0C07; --soft:#3A211A; --saffron:#F6BD4B;
+    --good:#74D3A0; --warn:#F2B963; --bad:#FF8F85; --good-soft:#1C3327; --warn-soft:#3A2C12; --bad-soft:#421E1B;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#17110F; --surface:#221916; --ink:#F6EEEA; --muted:#B5A69F; --line:#3B2E29;
+  --accent:#FF6B4A; --accent-ink:#1E0C07; --soft:#3A211A; --saffron:#F6BD4B;
+  --good:#74D3A0; --warn:#F2B963; --bad:#FF8F85; --good-soft:#1C3327; --warn-soft:#3A2C12; --bad-soft:#421E1B;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.5 var(--body);-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--display);line-height:1.05;margin:0;text-wrap:balance;letter-spacing:-.01em}
+h1{font-size:clamp(2.3rem,5.4vw,4rem);font-weight:800}
+h2{font-size:clamp(1.5rem,3vw,2.1rem);font-weight:800}
+h3{font-size:1.15rem;font-weight:600}
+p{margin:0}
+a{color:inherit}
+img{max-width:100%}
+.wrap{max-width:1160px;margin:0 auto;padding:0 20px}
+.muted{color:var(--muted)}
+.mono{font-family:var(--mono);font-size:.82rem}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+:focus-visible{outline:3px solid var(--saffron);outline-offset:2px;border-radius:6px}
+
+/* header */
+header.top{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding-top:10px;padding-bottom:10px}
+.brand{display:flex;align-items:center;gap:9px;font:800 1.25rem var(--display);text-decoration:none}
+.brand i{width:26px;height:26px;border-radius:50%;background:var(--accent);box-shadow:inset 0 0 0 5px var(--accent),inset 0 0 0 7px var(--accent-ink);display:block}
+nav.steps{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
+nav.steps a{display:flex;align-items:center;gap:7px;padding:7px 12px;border-radius:999px;text-decoration:none;font-weight:600;font-size:.92rem;color:var(--muted)}
+nav.steps a b{font:600 .72rem var(--mono);border:1.5px solid currentColor;border-radius:50%;width:20px;height:20px;display:grid;place-items:center}
+nav.steps a[aria-current="step"]{background:var(--ink);color:var(--bg)}
+nav.steps a[aria-disabled="true"]{opacity:.45;pointer-events:none}
+.demo-flag{background:var(--saffron);color:#231300;font-weight:700;font-size:.85rem;text-align:center;padding:6px 16px}
+
+/* buttons */
+.btn{appearance:none;border:1.5px solid var(--ink);background:transparent;color:var(--ink);font:600 .95rem var(--body);padding:10px 16px;border-radius:10px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;text-decoration:none;justify-content:center}
+.btn:hover{background:var(--soft)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.big{padding:14px 22px;font-size:1.05rem}
+.btn.small{padding:6px 10px;font-size:.84rem;border-width:1px;border-color:var(--line)}
+.btn[disabled],.btn[aria-disabled="true"]{opacity:.45;cursor:not-allowed;filter:none}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.spin{width:15px;height:15px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:sp .8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.spin{animation-duration:2.4s}}
+
+/* cards */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px}
+.pill{display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:.78rem;padding:3px 9px;border-radius:999px;background:var(--line);white-space:nowrap}
+.pill.good{background:var(--good-soft);color:var(--good)} .pill.warn{background:var(--warn-soft);color:var(--warn)} .pill.bad{background:var(--bad-soft);color:var(--bad)} .pill.acc{background:var(--soft);color:var(--accent)}
+.note{border-left:4px solid var(--line);padding:8px 12px;border-radius:0 8px 8px 0;font-size:.92rem;background:var(--bg)}
+.note.bad{border-color:var(--bad);background:var(--bad-soft)} .note.warn{border-color:var(--warn);background:var(--warn-soft)} .note.good{border-color:var(--good);background:var(--good-soft)}
+.stack{display:flex;flex-direction:column;gap:14px}
+.eyebrow{font:600 .75rem var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+
+/* home */
+.hero{display:grid;grid-template-columns:1.15fr .85fr;gap:40px;align-items:center;padding:48px 0 40px}
+.hero p.lead{font-size:1.15rem;max-width:34em;color:var(--muted)}
+.phone{width:min(270px,70vw);aspect-ratio:9/16;border-radius:30px;border:8px solid var(--ink);background:#2a1712;position:relative;overflow:hidden;margin:0 auto;box-shadow:0 24px 50px -24px rgba(60,20,10,.55)}
+.phone video,.phone canvas,.phone img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000}
+.phone .ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:22px;color:#F6EEEA;font-size:.92rem}
+.plate{position:absolute;left:50%;top:36%;width:78%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle at 50% 50%,#b5532a 0 22%,#e0a13a 22% 30%,#f4ece6 30% 58%,#d9cfc8 58% 60%,#f4ece6 60% 100%)}
+.phone .cap{position:absolute;left:0;right:0;bottom:0;padding:70px 18px 20px;background:linear-gradient(transparent,rgba(20,8,5,.92));color:#fff}
+.phone .cap strong{display:block;font:800 1.5rem/1.05 var(--display)}
+.phone .cap span{color:var(--saffron);font-weight:600;font-size:.85rem}
+.tag-ex{position:absolute;top:10px;left:10px;background:rgba(0,0,0,.6);color:#fff;font:600 .68rem var(--mono);padding:3px 7px;border-radius:6px;z-index:2}
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.three .card b.n{font:600 .8rem var(--mono);color:var(--accent)}
+section.band{padding:28px 0}
+.trust{display:flex;gap:12px;align-items:flex-start;font-size:.95rem}
+
+/* assets */
+.cols{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:20px;align-items:start;padding:28px 0 60px}
+.side{position:sticky;top:76px}
+.drop{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;border:2px dashed var(--muted);border-radius:12px;padding:26px 16px;cursor:pointer;background:var(--bg)}
+.drop:hover,.drop.over,.drop:focus-within{border-color:var(--accent);background:var(--soft)}
+.drop strong{font-size:1.05rem}
+.filerow{display:flex;gap:10px;align-items:center;flex-wrap:wrap;border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.filerow .nm{font-weight:600;word-break:break-all}
+.grow{flex:1;min-width:120px}
+.map{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:.84rem;font-weight:600}
+select,input[type=text],input[type=url],textarea{font:inherit;color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:8px;padding:8px 10px;width:100%}
+textarea{resize:vertical;min-height:90px}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font:400 .8rem var(--mono)}
+th,td{text-align:left;padding:6px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{background:var(--bg);font-weight:600}
+tr:last-child td{border-bottom:0}
+.thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.thumb{border:1px solid var(--line);border-radius:10px;overflow:hidden;display:flex;flex-direction:column}
+.thumb img{aspect-ratio:1;object-fit:cover;width:100%;display:block;background:var(--line)}
+.thumb .in{padding:8px;display:flex;flex-direction:column;gap:6px;font-size:.8rem}
+.thumb .in .nm{font-weight:600;word-break:break-all}
+ul.check{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+ul.check li{display:flex;gap:9px;align-items:flex-start;font-size:.93rem}
+ul.check li i{flex:none;width:20px;height:20px;border-radius:50%;border:2px solid var(--muted);margin-top:1px;display:grid;place-items:center;font:700 .7rem var(--mono);font-style:normal}
+ul.check li.done i{background:var(--good);border-color:var(--good);color:var(--surface)}
+ul.check li.warn i{border-color:var(--warn);color:var(--warn)}
+ul.msgs{margin:0;padding-left:18px;font-size:.9rem;display:flex;flex-direction:column;gap:3px}
+
+/* recommendation */
+.ticket{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:24px;position:relative}
+.ticket::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--accent);border-radius:var(--r) 0 0 var(--r)}
+.seg{display:inline-flex;border:1.5px solid var(--ink);border-radius:10px;overflow:hidden}
+.seg label{padding:8px 14px;font-weight:600;font-size:.92rem;cursor:pointer}
+.seg input:checked+span{color:var(--accent-ink)}
+.seg label:has(input:checked){background:var(--accent);color:var(--accent-ink)}
+.seg label:focus-within{outline:3px solid var(--saffron);outline-offset:-3px}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.kv div{border-top:2px solid var(--line);padding-top:8px}
+.kv dt{font-size:.78rem;color:var(--muted);font-weight:600}
+.kv dd{margin:0;font:800 1.5rem var(--display);font-variant-numeric:tabular-nums}
+.bars{display:flex;flex-direction:column;gap:6px;font-size:.86rem}
+.bar{display:grid;grid-template-columns:minmax(90px,170px) 1fr 44px;gap:10px;align-items:center}
+.bar span.t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar .tr{height:14px;background:var(--bg);border-radius:4px;overflow:hidden}
+.bar .tr i{display:block;height:100%;background:var(--muted);border-radius:4px;min-width:2px}
+.bar.hit{font-weight:700}.bar.hit .tr i{background:var(--accent)}
+.bar em{font-style:normal;font-variant-numeric:tabular-nums;text-align:right;font-family:var(--mono);font-size:.8rem}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.opt{border:1.5px solid var(--line);border-radius:10px;padding:12px;display:flex;gap:10px;cursor:pointer;align-items:flex-start}
+.opt:has(input:checked){border-color:var(--accent);background:var(--soft)}
+.opt:has(input:disabled){opacity:.5;cursor:not-allowed}
+.opt small{display:block;color:var(--muted)}
+
+/* results */
+.res{display:grid;grid-template-columns:300px minmax(0,1fr);gap:28px;align-items:start;padding:28px 0 60px}
+.prog{height:8px;background:var(--line);border-radius:4px;overflow:hidden}
+.prog i{display:block;height:100%;width:0;background:var(--accent)}
+.vars{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(120px,1fr));gap:8px;overflow-x:auto}
+.cal .card{padding:12px;font-size:.86rem}
+#toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-weight:600;font-size:.92rem;opacity:0;pointer-events:none;transition:opacity .2s;z-index:9;max-width:90vw}
+#toast.on{opacity:1}
+footer{border-top:1px solid var(--line);padding:18px 0;font-size:.85rem;color:var(--muted)}
+
+@media (max-width:860px){
+  .hero{grid-template-columns:1fr;padding-top:28px}
+  .three{grid-template-columns:1fr}
+  .cols,.res{grid-template-columns:1fr}
+  .side{position:static}
+  nav.steps{margin-left:0;width:100%}
+  nav.steps a span{display:none} nav.steps a[aria-current="step"] span{display:inline}
+}
+/* ---- simplified layout ---- */
+.one{max-width:680px;margin:0 auto;padding:44px 0 72px;display:flex;flex-direction:column;gap:26px}
+.hero{padding:64px 0 72px}
+.steps3{list-style:none;margin:0;padding:0;display:flex;gap:18px;flex-wrap:wrap;font-weight:600;font-size:.95rem;color:var(--muted)}
+.steps3 li{display:flex;align-items:center;gap:8px}
+.steps3 b{font:600 .75rem var(--mono);width:22px;height:22px;border-radius:50%;background:var(--soft);color:var(--accent);display:grid;place-items:center}
+.linkish{appearance:none;background:none;border:0;padding:0;font:inherit;font-weight:600;color:var(--accent);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.linkish[disabled]{opacity:.5}
+.bigdrop{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;border:2px dashed var(--muted);border-radius:20px;padding:52px 20px;background:var(--surface)}
+.bigdrop.over{border-color:var(--accent);background:var(--soft)}
+.bigdrop .plus{width:68px;height:68px;border-radius:50%;background:var(--soft);color:var(--accent);font:600 2.6rem/1 var(--display);display:grid;place-items:center;padding-bottom:6px}
+.bigdrop strong{font:800 1.5rem var(--display)}
+.bigdrop em{font-style:normal;color:var(--muted);margin-bottom:6px}
+.bigdrop.small{flex-direction:row;justify-content:center;padding:16px;gap:14px;flex-wrap:wrap;border-radius:14px}
+.bigdrop.small .plus{width:36px;height:36px;font-size:1.5rem;padding-bottom:3px}
+.bigdrop.small strong{font:600 1rem var(--body)}
+ul.files{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.frow{display:flex;align-items:center;gap:12px;padding:12px 2px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.frow i{flex:none;width:24px;height:24px;border-radius:50%;border:2px dashed var(--muted);display:grid;place-items:center;font:700 .8rem var(--mono);font-style:normal}
+.frow.ok i{background:var(--good);border:0;color:var(--surface)}
+.frow .grow{display:flex;flex-direction:column}
+.frow .grow span{font-size:.86rem}
+.frow:not(.ok) strong{color:var(--muted);font-weight:600}
+.mini{display:flex;gap:8px;flex-wrap:wrap}
+.mt{position:relative;width:56px;height:56px}
+.mt img{width:100%;height:100%;object-fit:cover;border-radius:8px;display:block}
+.mt button{position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;border:0;background:var(--ink);color:var(--bg);font-size:.8rem;line-height:1;cursor:pointer;padding:0}
+.attn{background:var(--warn-soft);border-radius:14px;padding:16px 18px}
+.attn h3{font-size:1rem;margin-bottom:8px}
+.attn ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px;font-size:.93rem}
+.fix{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.fiximg{width:40px;height:40px;object-fit:cover;border-radius:6px;flex:none}
+details.adv{font-size:.92rem}
+details.adv summary{cursor:pointer;font-weight:600;color:var(--muted)}
+.res{padding-top:44px}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#home"><i aria-hidden="true"></i>PlateReel</a>
+    <nav class="steps" id="nav" aria-label="Campaign steps"></nav>
+  </div>
+  <div id="demoflag"></div>
+</header>
+<main id="app" class="wrap"></main>
+<footer><div class="wrap">PlateReel · hackathon build. API keys stay on the server or in your notebook's secrets manager. This page never asks for one.</div></footer>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* =====================================================================
+   PlateReel frontend. Single file, no build step.
+   Integration boundary: see API below. With no backend URL set, the sales
+   analysis and the video render run in the browser on the uploaded files,
+   and post copy comes from JSON pasted from the notebook (or a labelled
+   non-AI template). No API key is ever read, stored or sent from here.
+   ===================================================================== */
+const S = {
+  view:'home', demo:false, apiBase:'',
+  menu:null, sales:null, photos:[], intakeErr:[], pending:[],
+  analysis:null, analysisErr:null, stale:false, targetType:'dish',
+  postSource:'paste', pasteText:'', postErr:null, tplIdx:0,
+  campaign:null,            // {target, post, source, variants, calendar}
+  video:null, videoErr:null, vdur:15,
+  busy:{analyze:false, post:false, video:false, demo:false}
+};
+
+const FIELDS = {
+  menu:[
+    {k:'dish',label:'Dish name',req:true,syn:['dish','item','name','dish name','menu item','item name']},
+    {k:'price',label:'Price',syn:['price','cost','amount']},
+    {k:'category',label:'Category',syn:['category','type','section','course']},
+    {k:'photo',label:'Photo filename',syn:['photo','photo filename','photo file','image','filename','file','picture','img']}
+  ],
+  sales:[
+    {k:'date',label:'Date',req:true,syn:['date','day','sale date','order date']},
+    {k:'dish',label:'Dish name',req:true,syn:['dish','item','name','dish name','menu item','item name']},
+    {k:'qty',label:'Quantity sold',req:true,syn:['quantity','qty','units','sold','count','quantity sold','units sold']}
+  ]
+};
+const EXPECT = {menu:'dish, price, category, photo filename', sales:'date, dish, quantity (one week)'};
+
+/* ---------- helpers ---------- */
+const $ = (s,r=document)=>r.querySelector(s);
+const esc = s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const hn = s=>String(s??'').toLowerCase().replace(/[_\-]+/g,' ').replace(/\s+/g,' ').trim();
+const dn = s=>String(s??'').toLowerCase().replace(/[^a-z0-9]+/g,'');
+const fnm = s=>dn(String(s??'').replace(/\.[a-z0-9]{2,5}$/i,''));
+const kb = n=>n<1024?n+' B':n<1048576?(n/1024).toFixed(1)+' KB':(n/1048576).toFixed(1)+' MB';
+const money = p=>{const t=String(p??'').trim(); if(!t) return ''; return /^[0-9]+([.,][0-9]+)?$/.test(t)?'$'+t:t;};
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),2400);}
+async function copyText(text,what){
+  try{ await navigator.clipboard.writeText(text); toast(what+' copied'); }
+  catch(e){
+    const ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select();
+    let ok=false; try{ ok=document.execCommand('copy'); }catch(_){}
+    ta.remove(); toast(ok?what+' copied':'Copy was blocked. Select the text and copy it by hand.');
+  }
+}
+function download(href,name){const a=document.createElement('a');a.href=href;a.download=name;document.body.appendChild(a);a.click();a.remove();}
+
+function parseCSV(text){
+  text=text.replace(/^﻿/,'');
+  const first=text.split(/\r?\n/)[0]||'';
+  const d=[',',';','\t'].map(c=>[c,first.split(c).length]).sort((a,b)=>b[1]-a[1])[0][0];
+  const rows=[];let row=[],cur='',q=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i];
+    if(q){ if(c==='"'){ if(text[i+1]==='"'){cur+='"';i++;} else q=false; } else cur+=c; }
+    else if(c==='"') q=true;
+    else if(c===d){row.push(cur);cur='';}
+    else if(c==='\n'||c==='\r'){ if(c==='\r'&&text[i+1]==='\n') i++; row.push(cur);rows.push(row);row=[];cur=''; }
+    else cur+=c;
+  }
+  if(cur!==''||row.length){row.push(cur);rows.push(row);}
+  return rows.filter(r=>r.some(c=>String(c).trim()!==''));
+}
+
+/* ---------- data access ---------- */
+function cell(d,r,k){const i=d.map[k];return i>=0?String(r[i]??'').trim():'';}
+function menuRows(){const d=S.menu;if(!d)return[];return d.rows.map(r=>({dish:cell(d,r,'dish'),price:cell(d,r,'price'),category:cell(d,r,'category'),photo:cell(d,r,'photo')})).filter(r=>r.dish);}
+function salesRows(){const d=S.sales;if(!d)return[];return d.rows.map(r=>{const date=cell(d,r,'date'),dish=cell(d,r,'dish'),raw=cell(d,r,'qty');const qty=parseFloat(raw.replace(/[^0-9.\-]/g,''));return{date,dish,qty,valid:!!date&&!!dish&&raw!==''&&isFinite(qty)&&qty>=0};});}
+function dayLabel(s){
+  let d=/^\d{4}-\d{2}-\d{2}$/.test(s)?new Date(s+'T12:00:00'):new Date(s);
+  if(isNaN(d)) return s;
+  return d.toLocaleDateString(undefined,{weekday:'long',month:'short',day:'numeric'});
+}
+
+function matchPhotos(){
+  const menu=menuRows();
+  S.photos.forEach(p=>{
+    if(p.manual) { if(p.dish && !menu.some(m=>m.dish===p.dish)) {p.dish=null;p.manual=false;} else return; }
+    const f=fnm(p.name);
+    let m=menu.find(r=>r.photo&&fnm(r.photo)===f);
+    if(!m) m=menu.filter(r=>dn(r.dish).length>2&&(f.includes(dn(r.dish))||dn(r.dish).includes(f))).sort((a,b)=>dn(b.dish).length-dn(a.dish).length)[0];
+    p.dish=m?m.dish:null;
+  });
+}
+
+function check(){
+  const o={menu:{e:[],w:[]},sales:{e:[],w:[]},photos:{e:[],w:[]}};
+  const menu=menuRows();
+  if(S.menu){
+    const d=S.menu;
+    if(d.map.dish<0) o.menu.e.push('Pick the column that holds the dish name.');
+    FIELDS.menu.filter(f=>!f.req&&d.map[f.k]<0).forEach(f=>o.menu.w.push(`No “${f.label}” column found. Map one below if it exists under another name.`));
+    if(d.map.dish>=0){
+      const blank=d.rows.length-menu.length; if(blank) o.menu.w.push(`${blank} row${blank>1?'s have':' has'} no dish name and ${blank>1?'are':'is'} left out.`);
+      if(!menu.length) o.menu.e.push('No dishes found in this file.');
+      const seen=new Set(),dup=new Set(); menu.forEach(m=>{const k=dn(m.dish); if(seen.has(k)) dup.add(m.dish); seen.add(k);});
+      if(dup.size) o.menu.w.push(`Listed more than once: ${[...dup].join(', ')}.`);
+    }
+  }
+  if(S.sales){
+    const d=S.sales;
+    FIELDS.sales.filter(f=>d.map[f.k]<0).forEach(f=>o.sales.e.push(`Pick the column that holds “${f.label}”.`));
+    if(!o.sales.e.length){
+      const rows=salesRows(),ok=rows.filter(r=>r.valid),bad=rows.length-ok.length;
+      if(!ok.length) o.sales.e.push('No usable sales rows. Each row needs a date, a dish and a number sold.');
+      if(bad&&ok.length) o.sales.w.push(`${bad} row${bad>1?'s':''} with a missing date, dish or a quantity that isn’t a number ${bad>1?'are':'is'} left out of the analysis.`);
+      const days=new Set(ok.map(r=>r.date)).size;
+      if(ok.length&&days!==7) o.sales.w.push(`This file covers ${days} day${days===1?'':'s'}. One week (7 days) is expected.`);
+      if(menu.length){
+        const mk=new Set(menu.map(m=>dn(m.dish)));
+        const off=[...new Set(ok.filter(r=>!mk.has(dn(r.dish))).map(r=>r.dish))];
+        if(off.length) o.sales.w.push(`Sold but not on the menu file: ${off.slice(0,4).join(', ')}${off.length>4?` and ${off.length-4} more`:''}. Check spelling. These are not considered for promotion.`);
+      }
+    }
+  }
+  const n=S.photos.length;
+  if(n&&n<8) o.photos.w.push(`${n} photo${n>1?'s':''} added. 8–10 are expected, so the video will have fewer shots.`);
+  if(n&&menu.length){
+    const un=S.photos.filter(p=>!p.dish).length;
+    if(un) o.photos.w.push(`${un} photo${un>1?'s aren’t':' isn’t'} linked to a dish. Pick the dish on each card, or leave ${un>1?'them':'it'} as extra footage.`);
+    const have=new Set(S.photos.filter(p=>p.dish).map(p=>p.dish));
+    const miss=menu.filter(m=>!have.has(m.dish)).map(m=>m.dish);
+    if(miss.length) o.photos.w.push(`No photo yet for: ${miss.slice(0,4).join(', ')}${miss.length>4?` and ${miss.length-4} more`:''}.`);
+  }
+  o.ready=!!S.menu&&!!S.sales&&n>0&&!o.menu.e.length&&!o.sales.e.length&&!o.photos.e.length;
+  return o;
+}
+
+/* ---------- file intake: one drop area, files sorted automatically ---------- */
+function changed(){ if(S.analysis){S.analysis=null;S.stale=true;} S.analysisErr=null; matchPhotos(); }
+function guessKind(headers,name){
+  const h=headers.map(hn),has=(kind,k)=>h.some(x=>FIELDS[kind].find(f=>f.k===k).syn.includes(x));
+  const s=(has('sales','date')?1:0)+(has('sales','qty')?1:0),m=(has('menu','price')?1:0)+(has('menu','category')?1:0)+(has('menu','photo')?1:0);
+  if(s>m) return 'sales'; if(m>s) return 'menu';
+  if(/sale|order/i.test(name)) return 'sales'; if(/menu/i.test(name)) return 'menu'; return null;
+}
+async function readCsv(file){
+  if(!/\.(csv|tsv|txt)$/i.test(file.name)&&!/csv/.test(file.type)) return {err:`“${file.name}” isn’t a CSV file, so it wasn’t added. In Excel or Google Sheets, download the sheet as CSV.`};
+  if(file.size>5*1048576) return {err:`“${file.name}” is too large (${kb(file.size)}). Keep it to one week of sales.`};
+  let text; try{ text=await file.text(); }catch(e){ return {err:`“${file.name}” couldn’t be read. Try adding it again.`}; }
+  const rows=parseCSV(text);
+  if(rows.length<2) return {err:`“${file.name}” looks empty, so it wasn’t added.`};
+  return {file,headers:rows[0].map(h=>String(h).trim()),rows:rows.slice(1)};
+}
+function setCsv(kind,r){const map={};FIELDS[kind].forEach(f=>{map[f.k]=r.headers.findIndex(h=>f.syn.includes(hn(h)));});S[kind]={file:r.file,name:r.file.name,size:r.file.size,headers:r.headers,rows:r.rows,map};}
+async function loadCsv(kind,file){
+  const r=await readCsv(file); if(r.err){S.intakeErr.push(r.err);return;}
+  const k=kind||guessKind(r.headers,file.name);
+  if(k) setCsv(k,r); else S.pending.push(r);
+  changed();
+}
+function addPhotos(files){
+  for(const f of files){
+    if(f.size>15*1048576){ S.intakeErr.push(`“${f.name}” is too large (${kb(f.size)}), so it wasn’t added.`); continue; }
+    const ex=S.photos.findIndex(p=>p.name===f.name);
+    if(ex<0&&S.photos.length>=10){ S.intakeErr.push(`“${f.name}” wasn’t added. 10 photos is the limit, so remove one first.`); continue; }
+    const p={id:Math.random().toString(36).slice(2),file:f,name:f.name,size:f.size,url:URL.createObjectURL(f),dish:null,manual:false};
+    if(ex>=0){ URL.revokeObjectURL(S.photos[ex].url); S.photos[ex]=p; } else S.photos.push(p);
+  }
+  changed();
+}
+async function addFiles(files){
+  S.intakeErr=[]; const imgs=[];
+  for(const f of files){
+    if(f.name.startsWith('.')) continue;
+    if(f.type.startsWith('image/')||/\.(jpe?g|png|webp)$/i.test(f.name)) imgs.push(f);
+    else if(/\.(csv|tsv)$/i.test(f.name)||/csv/.test(f.type)) await loadCsv(null,f);
+    else S.intakeErr.push(`“${f.name}” wasn’t added. Only CSV files and photos are used here.`);
+  }
+  if(imgs.length) addPhotos(imgs);
+  render();
+}
+
+/* ---------- API boundary ---------- */
+const API = {
+  on:()=>!!S.apiBase,
+  async call(path,opts){
+    let res;
+    try{ res=await fetch(S.apiBase.replace(/\/+$/,'')+path,opts); }
+    catch(e){ throw new Error('Couldn’t reach the backend at '+S.apiBase+'. Check it is running and allows requests from this page.'); }
+    if(!res.ok) throw new Error(`The backend answered ${res.status} for ${path}.`);
+    try{ return await res.json(); }catch(e){ throw new Error(`The backend reply for ${path} wasn’t valid JSON.`); }
+  },
+  // POST /api/analyze (multipart: menu, sales) -> {targets:[{type:'dish'|'day',name,reason,feature?,details?:[[label,value]]}]}
+  analyze(){ const fd=new FormData(); fd.append('menu',S.menu.file); fd.append('sales',S.sales.file); fd.append('menu_columns',JSON.stringify(colNames('menu'))); fd.append('sales_columns',JSON.stringify(colNames('sales'))); return this.call('/api/analyze',{method:'POST',body:fd}); },
+  // POST /api/post {target} -> {hook,caption,hashtags[],cta,variants?[],calendar?[]}
+  post(target){ return this.call('/api/post',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({target})}); },
+  // POST /api/video (multipart: target, post, photos[]) -> {video_url,duration_seconds?}
+  video(c){ const fd=new FormData(); fd.append('target',JSON.stringify(c.target)); fd.append('post',JSON.stringify(c.post)); S.photos.forEach(p=>fd.append('photos',p.file,p.name)); return this.call('/api/video',{method:'POST',body:fd}); }
+};
+function colNames(kind){const o={};FIELDS[kind].forEach(f=>{const i=S[kind].map[f.k];o[f.k]=i>=0?S[kind].headers[i]:null;});return o;}
+
+/* ---------- analysis (browser, on the uploaded rows) ---------- */
+function analyzeLocal(){
+  const menu=menuRows(),sales=salesRows().filter(r=>r.valid);
+  const tot=new Map(); menu.forEach(m=>{ if(!tot.has(dn(m.dish))) tot.set(dn(m.dish),{name:m.dish,units:0,price:m.price,category:m.category}); });
+  const days=new Map();
+  sales.forEach(r=>{ const t=tot.get(dn(r.dish)); if(t) t.units+=r.qty; days.set(r.date,(days.get(r.date)||0)+r.qty); });
+  const list=[...tot.values()].sort((a,b)=>a.units-b.units);
+  const dl=[...days.entries()].map(([date,units])=>({date,units})).sort((a,b)=>a.units-b.units);
+  if(!list.length||!dl.length) throw new Error('There isn’t enough matching data to compare dishes. Check the column mapping on both files.');
+  const nd=dl.length, slow=list[0], top=list[list.length-1], avg=list.reduce((s,x)=>s+x.units,0)/list.length;
+  const q=dl[0], busy=dl[dl.length-1], davg=dl.reduce((s,x)=>s+x.units,0)/nd;
+  const r1=n=>Math.round(n*10)/10;
+  const period=`${nd} day${nd>1?'s':''} of sales`;
+  const targets=[
+    {type:'dish',name:slow.name,feature:slow.name,price:slow.price,category:slow.category,
+     reason:`${slow.name} sold ${slow.units} in ${nd} day${nd>1?'s':''}, the fewest of ${list.length} menu items. The average dish sold ${r1(avg)}.`,
+     details:[['Units sold',slow.units],['Menu average',r1(avg)],['Best seller',`${top.name} (${top.units})`],['Period',period]]},
+    {type:'day',name:dayLabel(q.date),feature:top.name,price:top.price,category:top.category,
+     reason:`${dayLabel(q.date)} had ${q.units} items sold, the quietest of ${nd} days. The daily average was ${r1(davg)}.`,
+     details:[['Items sold that day',q.units],['Daily average',r1(davg)],['Busiest day',`${dayLabel(busy.date)} (${busy.units})`],['Dish to feature',`${top.name}, your best seller`]]}
+  ];
+  return {source:'browser',targets,bars:{dish:list.map(x=>({t:x.name,v:x.units})),day:[...days.entries()].map(([d,v])=>({t:dayLabel(d),v}))}};
+}
+async function runAnalysis(){
+  if(S.busy.analyze||!check().ready) return;
+  S.busy.analyze=true; S.analysisErr=null; render();
+  try{
+    let a;
+    if(API.on()){
+      const r=await API.analyze();
+      const t=(r&&Array.isArray(r.targets)?r.targets:[]).filter(x=>x&&x.name&&x.reason&&(x.type==='dish'||x.type==='day'));
+      if(!t.length) throw new Error('The backend replied, but without a recommendation (expected “targets” with type, name and reason).');
+      a={source:'backend',targets:t.map(x=>({...x,feature:x.feature||(x.type==='dish'?x.name:null),details:Array.isArray(x.details)?x.details:[]})),bars:null};
+    } else {
+      await new Promise(r=>setTimeout(r,250));
+      a=analyzeLocal();
+    }
+    S.analysis=a; S.stale=false; S.targetType=a.targets[0].type; S.busy.analyze=false; go('recommendation');
+  }catch(e){ S.busy.analyze=false; S.analysisErr=e.message; render(); }
+}
+const curTarget=()=>S.analysis&&(S.analysis.targets.find(t=>t.type===S.targetType)||S.analysis.targets[0]);
+
+/* ---------- post ---------- */
+function normPost(o){
+  if(!o||typeof o!=='object') throw new Error('That isn’t a post object.');
+  const hook=String(o.hook||'').trim(),caption=String(o.caption||'').trim(),cta=String(o.cta||o.call_to_action||'').trim();
+  let h=o.hashtags; if(typeof h==='string') h=h.split(/[\s,]+/); if(!Array.isArray(h)) h=[];
+  h=h.map(x=>String(x).trim()).filter(Boolean).map(x=>x.startsWith('#')?x:'#'+x);
+  if(!hook||!caption) throw new Error('The post is missing a hook or a caption.');
+  return {hook,caption,hashtags:h,cta,label:o.label||o.style||''};
+}
+function parsePosted(r){
+  if(Array.isArray(r)) r={variants:r};
+  let variants=Array.isArray(r.variants)?r.variants.map(normPost):null;
+  const post=(r.hook||r.caption)?normPost(r):(variants?variants[0]:normPost(r));
+  if(variants&&variants.length<2) variants=null;
+  const calendar=Array.isArray(r.calendar)&&r.calendar.length?r.calendar.slice(0,7):null;
+  return {post:{...post},variants,calendar};
+}
+const TPL=[
+  t=>`Have you tried our ${t.feature} yet?`,
+  t=>`The ${t.feature} deserves a spot on your table.`,
+  t=>t.type==='day'?`${t.name.split(',')[0]}s just got better.`:`Our best-kept secret: ${t.feature}.`
+];
+function templatePost(t){
+  const camel=s=>String(s||'').replace(/[^A-Za-z0-9 ]/g,'').split(/\s+/).filter(Boolean).map(w=>w[0].toUpperCase()+w.slice(1)).join('');
+  const p=money(t.price);
+  const caption=t.type==='day'
+    ? `Make ${t.name.split(',')[0]} the day you treat yourself. Come in for our ${t.feature}${p?` (${p})`:''} and see why it’s the one everybody orders.`
+    : `Our ${t.feature}${t.category?` from the ${t.category.toLowerCase()} menu`:''} is made fresh every day${p?` and it’s just ${p}`:''}. Come try it this week.`;
+  const tags=[...new Set(['#'+camel(t.feature),t.category?'#'+camel(t.category):'','#EatLocal','#FoodieFinds','#SupportLocalRestaurants','#DinnerTonight','#RestaurantSpecials'].filter(x=>x.length>1))].slice(0,7);
+  return {hook:TPL[S.tplIdx%TPL.length](t),caption,hashtags:tags,cta:'Call or stop by today to order.',label:''};
+}
+async function createCampaign(){
+  if(S.busy.post) return;
+  const target=curTarget(); if(!target) return;
+  S.postErr=null; S.busy.post=true; render();
+  try{
+    let out,source=S.postSource;
+    if(source==='backend'){ out=parsePosted(await API.post(target)); }
+    else if(source==='paste'){
+      let j; try{ j=JSON.parse(S.pasteText.replace(/^```(json)?/i,'').replace(/```\s*$/,'').trim()); }catch(e){ throw new Error('That text isn’t valid JSON. Paste exactly what the notebook printed, starting with { and ending with }.'); }
+      out=parsePosted(j);
+    } else { out={post:templatePost(target),variants:null,calendar:null}; }
+    if(S.video&&S.video.revoke) URL.revokeObjectURL(S.video.url);
+    S.video=null; S.videoErr=null;
+    S.campaign={target,source,...out,active:0};
+    S.busy.post=false; go('results'); makeVideo();
+  }catch(e){ S.busy.post=false; S.postErr=e.message; render(); }
+}
+
+/* ---------- video ---------- */
+function loadImg(url){return new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>rej(new Error('A photo couldn’t be opened for the video. Remove it on the Assets step and try again.'));i.src=url;});}
+function wrap(ctx,text,maxW){const out=[];String(text).split('\n').forEach(par=>{let line='';par.split(/\s+/).forEach(w=>{const t=line?line+' '+w:w;if(ctx.measureText(t).width>maxW&&line){out.push(line);line=w;}else line=t;});if(line)out.push(line);});return out;}
+function drawScene(ctx,sc,t,p){
+  const W=1080,H=1920,img=sc.img,z=1.03+0.07*p,s=Math.max(W/img.width,H/img.height)*z,w=img.width*s,h=img.height*s;
+  ctx.globalAlpha=1; ctx.fillStyle='#000'; ctx.fillRect(0,0,W,H); ctx.drawImage(img,(W-w)/2,(H-h)/2,w,h);
+  let g=ctx.createLinearGradient(0,H*0.38,0,H); g.addColorStop(0,'rgba(18,7,4,0)'); g.addColorStop(1,sc.end?'rgba(18,7,4,.96)':'rgba(18,7,4,.9)'); ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+  if(sc.end){ctx.fillStyle='rgba(18,7,4,.45)';ctx.fillRect(0,0,W,H);}
+  const a=Math.min(1,t/0.45),dy=(1-a)*36; ctx.globalAlpha=a; ctx.textBaseline='alphabetic'; ctx.textAlign='left';
+  const size=sc.text.length<28?128:sc.text.length<60?104:sc.text.length<110?80:62;
+  ctx.font=`800 ${size}px "Bricolage Grotesque", Arial, sans-serif`;
+  const lines=wrap(ctx,sc.text,W-160),lh=size*1.06; let subL=[];
+  if(sc.sub){ctx.font='600 52px Figtree, Arial, sans-serif';subL=wrap(ctx,sc.sub,W-160);}
+  const block=lines.length*lh+(subL.length?28+subL.length*64:0);
+  let y=H-230-block+dy;
+  if(sc.kicker){ctx.font='700 40px Figtree, Arial, sans-serif';const kw=ctx.measureText(sc.kicker).width+48;ctx.fillStyle='#D7381C';ctx.beginPath();ctx.roundRect(80,y-96,kw,68,34);ctx.fill();ctx.fillStyle='#fff';ctx.fillText(sc.kicker,104,y-48);}
+  ctx.font=`800 ${size}px "Bricolage Grotesque", Arial, sans-serif`; ctx.fillStyle='#fff';
+  lines.forEach((l,i)=>ctx.fillText(l,80,y+size*0.86+i*lh));
+  if(subL.length){ctx.font='600 52px Figtree, Arial, sans-serif';ctx.fillStyle='#F6BD4B';const y2=y+lines.length*lh+28;subL.forEach((l,i)=>ctx.fillText(l,80,y2+48+i*64));}
+  ctx.globalAlpha=1;
+}
+async function renderInBrowser(c,canvas,onProg){
+  if(!canvas.captureStream||typeof MediaRecorder==='undefined') throw new Error('This browser can’t record video. Open the page in Chrome, Edge or Safari, or load the .mp4 from your notebook.');
+  const mime=['video/mp4;codecs=avc1.42E01E','video/mp4','video/webm;codecs=vp9','video/webm'].find(m=>MediaRecorder.isTypeSupported(m));
+  if(!mime) throw new Error('This browser has no supported video format. Load the .mp4 from your notebook instead.');
+  const mine=S.photos.filter(p=>p.dish===c.target.feature),rest=S.photos.filter(p=>p.dish!==c.target.feature);
+  const order=[...mine,...rest]; if(!order.length) throw new Error('There are no photos to build the video from. Add them on the Assets step.');
+  const imgs=await Promise.all(order.slice(0,6).map(p=>loadImg(p.url)));
+  try{ await Promise.all([document.fonts.load('800 100px "Bricolage Grotesque"'),document.fonts.load('600 52px Figtree')]); }catch(_){}
+  const post=c.post,t=c.target,pi=i=>imgs[i%imgs.length];
+  const sc=[{img:pi(0),text:post.hook,kicker:t.type==='day'?t.name.split(',')[0]+' special':'This week'},
+            {img:pi(1),text:t.feature,sub:[money(t.price),t.category].filter(Boolean).join('  ·  ')}];
+  const firstSentence=(post.caption.match(/^.*?[.!?](\s|$)/)||[post.caption])[0].trim();
+  sc.push({img:pi(2),text:firstSentence});
+  order.slice(0,6).forEach((p,i)=>{ if(i>=3&&p.dish&&p.dish!==t.feature&&sc.length<5) sc.push({img:imgs[i],text:p.dish,kicker:'Also on the menu'}); });
+  sc.push({img:pi(0),text:post.cta||t.feature,sub:post.hashtags.slice(0,3).join('  '),end:true});
+  const dur=S.vdur,per=dur/sc.length,ctx=canvas.getContext('2d');
+  canvas.width=1080;canvas.height=1920; drawScene(ctx,sc[0],0,0);
+  const rec=new MediaRecorder(canvas.captureStream(30),{mimeType:mime,videoBitsPerSecond:5e6}),chunks=[];
+  rec.ondataavailable=e=>{if(e.data.size)chunks.push(e.data);};
+  const done=new Promise((res,rej)=>{rec.onstop=res;rec.onerror=()=>rej(new Error('Recording stopped unexpectedly. Try again.'));});
+  rec.start(250); const t0=performance.now();
+  await new Promise(res=>{(function frame(){const el=(performance.now()-t0)/1000;if(el>=dur)return res();const i=Math.min(sc.length-1,Math.floor(el/per));drawScene(ctx,sc[i],el-i*per,(el-i*per)/per);onProg(el/dur);requestAnimationFrame(frame);})();});
+  rec.stop(); await done;
+  const blob=new Blob(chunks,{type:mime.split(';')[0]});
+  if(!blob.size) throw new Error('The recording came out empty. Keep this tab in front while it renders and try again.');
+  return {url:URL.createObjectURL(blob),revoke:true,mime:blob.type,ext:blob.type.includes('mp4')?'mp4':'webm',duration:dur,size:blob.size,source:'browser'};
+}
+async function makeVideo(){
+  const c=S.campaign; if(!c||S.busy.video) return;
+  S.busy.video=true; S.videoErr=null; if(S.video&&S.video.revoke) URL.revokeObjectURL(S.video.url); S.video=null; render();
+  try{
+    if(API.on()){
+      const r=await API.video(c); if(!r||!r.video_url) throw new Error('The backend replied without a video_url.');
+      S.video={url:new URL(r.video_url,S.apiBase).href,mime:'video/mp4',ext:'mp4',duration:r.duration_seconds||null,source:'backend'};
+    } else {
+      const cv=$('#vcanvas')||document.createElement('canvas');
+      S.video=await renderInBrowser(c,cv,p=>{const b=$('#vprog');if(b)b.style.width=Math.round(p*100)+'%';const l=$('#vpct');if(l)l.textContent=Math.round(p*100)+'%';});
+    }
+  }catch(e){ S.videoErr=e.message; }
+  S.busy.video=false; render();
+}
+function loadVideoFile(f){
+  if(!f) return;
+  if(!f.type.startsWith('video/')){ S.videoErr=`“${f.name}” isn’t a video file. Choose the promo.mp4 your notebook produced.`; return render(); }
+  if(S.video&&S.video.revoke) URL.revokeObjectURL(S.video.url);
+  S.videoErr=null; S.video={url:URL.createObjectURL(f),revoke:true,mime:f.type,ext:(f.name.split('.').pop()||'mp4'),duration:null,size:f.size,source:'file',name:f.name}; render();
+}
+
+/* ---------- demo mode ---------- */
+const DEMO_MENU=[['Smoked Brisket Plate','18.50','Mains','brisket.jpg','#7a3b1e'],['Fried Catfish Basket','14.00','Mains','catfish.jpg','#c9892b'],['Shrimp and Grits','16.00','Mains','shrimp_grits.jpg','#e3b56a'],['Pimento Cheese Burger','13.50','Mains','burger.jpg','#a8462a'],['Collard Greens','4.50','Sides','collards.jpg','#3f6b3a'],['Mac and Cheese','5.00','Sides','mac.jpg','#e0a52e'],['Fried Green Tomatoes','7.50','Starters','fgt.jpg','#8a9a3a'],['Peach Cobbler','6.50','Desserts','cobbler.jpg','#d9772f'],['Banana Pudding','6.00','Desserts','banana_pudding.jpg','#e8cf7a']];
+const DEMO_QTY=[[22,18,25,30,41,48,36],[14,12,15,19,33,35,24],[9,8,11,12,20,24,15],[17,13,16,21,29,34,22],[11,9,10,14,19,23,16],[19,15,18,22,31,37,25],[2,1,3,2,4,5,3],[8,6,9,10,16,19,12],[10,7,9,12,17,20,14]];
+async function loadDemo(){
+  if(S.busy.demo) return; S.busy.demo=true; render();
+  const menuCsv='dish,price,category,photo filename\n'+DEMO_MENU.map(m=>m.slice(0,4).join(',')).join('\n');
+  let sales='date,dish,quantity\n'; for(let d=0;d<7;d++) DEMO_MENU.forEach((m,i)=>{sales+=`2026-11-${String(2+d).padStart(2,'0')},${m[0]},${DEMO_QTY[i][d]}\n`;});
+  const photos=await Promise.all(DEMO_MENU.map(m=>new Promise(res=>{
+    const c=document.createElement('canvas');c.width=720;c.height=1080;const x=c.getContext('2d');
+    x.fillStyle='#2b1a14';x.fillRect(0,0,720,1080);x.fillStyle='#f3ece6';x.beginPath();x.arc(360,470,290,0,7);x.fill();x.fillStyle='#e2d8d0';x.beginPath();x.arc(360,470,215,0,7);x.fill();
+    x.fillStyle=m[4];x.beginPath();x.ellipse(360,470,165,140,0.4,0,7);x.fill();x.fillStyle='rgba(255,255,255,.22)';x.beginPath();x.ellipse(310,430,60,34,0.4,0,7);x.fill();
+    x.fillStyle='#fff';x.font='700 40px Arial';x.textAlign='center';x.fillText(m[0],360,880);x.font='600 26px Arial';x.fillStyle='#F6BD4B';x.fillText('DEMO PLACEHOLDER, NOT A REAL PHOTO',360,930);
+    c.toBlob(b=>res(new File([b],m[3].replace('.jpg','.png'),{type:'image/png'})),'image/png');
+  })));
+  S.photos.forEach(p=>URL.revokeObjectURL(p.url)); S.photos=[]; S.campaign=null; S.video=null; S.analysis=null;
+  S.demo=true; S.busy.demo=false;
+  await loadCsv('menu',new File([menuCsv],'menu.csv',{type:'text/csv'}));
+  await loadCsv('sales',new File([sales],'sales.csv',{type:'text/csv'}));
+  addPhotos(photos); S.intakeErr=[]; S.pending=[]; go('assets'); render();
+}
+
+/* ---------- views ---------- */
+function go(v){ if(location.hash!=='#'+v) location.hash=v; else {S.view=v;render();} }
+function route(){
+  let v=(location.hash||'#home').slice(1); if(!['home','assets','recommendation','results'].includes(v)) v='home';
+  if(v==='home'&&false){} if(v==='recommendation'&&!S.analysis) v='assets'; if(v==='results'&&!S.campaign) v=S.analysis?'recommendation':'assets';
+  S.view=v; render(); window.scrollTo(0,0);
+}
+function renderNav(){
+  const items=[['assets','Add files','1',true],['recommendation','Review recommendation','2',!!S.analysis],['results','Get your campaign','3',!!S.campaign]];
+  $('#nav').innerHTML=items.map(([v,l,n,on])=>`<a href="#${v}" ${S.view===v?'aria-current="step"':''} ${on?'':'aria-disabled="true" tabindex="-1"'}><b aria-hidden="true">${n}</b><span>${l}</span></a>`).join('');
+  $('#demoflag').innerHTML=S.demo?'<div class="demo-flag">Sample data: a made-up menu, made-up sales and placeholder images. <a href="#assets" data-act="exit-demo">Clear it</a></div>':'';
+}
+function msgs(o){return (o.e.length?`<div class="note bad" role="alert"><ul class="msgs">${o.e.map(m=>`<li>${esc(m)}</li>`).join('')}</ul></div>`:'')+(o.w.length?`<div class="note warn"><ul class="msgs">${o.w.map(m=>`<li>${esc(m)}</li>`).join('')}</ul></div>`:'');}
+
+function viewHome(){
+  return `<section class="hero">
+    <div class="stack" style="gap:22px">
+      <h1>Turn last week’s sales into this week’s video.</h1>
+      <p class="lead">Add your menu, sales and dish photos. PlateReel picks a dish to promote, writes the post and builds a short vertical video.</p>
+      <div><a class="btn primary big" href="#assets">Create a campaign</a></div>
+      <ol class="steps3"><li><b>1</b>Add files</li><li><b>2</b>Review recommendation</li><li><b>3</b>Get your campaign</li></ol>
+      <p class="muted" style="font-size:.88rem">No files handy? <button class="linkish" data-act="demo" ${S.busy.demo?'disabled':''}>${S.busy.demo?'Loading sample…':'Try it with sample data'}</button></p>
+    </div>
+    <div class="phone" role="img" aria-label="Example of a vertical promo video frame with a headline over a dish photo">
+      <span class="tag-ex">EXAMPLE</span><div class="plate"></div>
+      <div class="cap"><span>This week</span><strong>Crispy, tangy, gone by Friday.</strong><span>Fried Green Tomatoes · $7.50</span></div>
+    </div>
+  </section>`;
+}
+
+function viewAssets(){
+  const o=check(),menu=menuRows(),n=S.photos.length,any=!!(S.menu||S.sales||n||S.pending.length||S.intakeErr.length);
+  const pick=`<label class="btn ${any?'':'primary big'}" tabindex="0">${any?'Add more files':'Choose files'}<input class="sr" type="file" multiple accept=".csv,text/csv,image/*" data-file="any" tabindex="-1"></label>`;
+  const drop=`<div class="bigdrop ${any?'small':''}" data-drop="any">
+      <span class="plus" aria-hidden="true">+</span>
+      <strong>Drop your files here</strong>
+      ${any?'':'<em>Add your menu CSV, sales CSV, and dish photos</em>'}
+      ${pick}
+      ${any?'':'<label class="linkish" tabindex="0">or choose a whole folder<input class="sr" type="file" webkitdirectory multiple data-file="any" tabindex="-1"></label>'}
+    </div>`;
+  const ctl=k=>`<label class="btn small" tabindex="0">Replace<input class="sr" type="file" accept=".csv,text/csv" data-replace="${k}" tabindex="-1" aria-label="Replace ${k} file"></label><button class="btn small" data-act="rm-${k}">Remove</button>`;
+  const rowf=(ok,title,sub,extra)=>`<li class="frow ${ok?'ok':''}"><i aria-hidden="true">${ok?'✓':''}</i><div class="grow"><strong>${title}</strong>${sub?`<span class="muted">${sub}</span>`:''}</div>${extra||''}</li>`;
+  const days=S.sales?new Set(salesRows().filter(r=>r.valid).map(r=>r.date)).size:0;
+  const list=any?`<ul class="files">
+      ${S.menu?rowf(true,'Menu added',`${esc(S.menu.name)} · ${menu.length} dishes`,ctl('menu')):rowf(false,'Menu CSV still needed','')}
+      ${S.sales?rowf(true,'Sales added',`${esc(S.sales.name)} · ${days} day${days===1?'':'s'}`,ctl('sales')):rowf(false,'Sales CSV still needed','')}
+      ${n?rowf(true,`${n} photo${n>1?'s':''} added`,n<8?'8–10 works best':'',`<button class="btn small" data-act="rm-photos">Remove all</button>`):rowf(false,'Dish photos still needed','8–10 photos')}
+    </ul>
+    ${n?`<div class="mini">${S.photos.map(p=>`<span class="mt"><img src="${p.url}" alt="${esc(p.dish||p.name)}" title="${esc(p.name)}"><button data-act="rm-photo" data-id="${p.id}" aria-label="Remove ${esc(p.name)}">×</button></span>`).join('')}</div>`:''}`:'';
+  // only what needs attention
+  const att=[];
+  S.intakeErr.forEach(m=>att.push(`<li>${esc(m)}</li>`));
+  S.pending.forEach((p,i)=>att.push(`<li><div class="fix"><span>Is <strong>${esc(p.file.name)}</strong> your menu or your sales?</span><span class="row"><button class="btn small" data-act="pend" data-i="${i}" data-k="menu">Menu</button><button class="btn small" data-act="pend" data-i="${i}" data-k="sales">Sales</button><button class="btn small" data-act="rm-pend" data-i="${i}">Remove</button></span></div></li>`));
+  ['menu','sales'].forEach(k=>{const d=S[k]; if(!d) return;
+    FIELDS[k].filter(f=>f.req&&d.map[f.k]<0).forEach(f=>att.push(`<li><div class="fix"><label for="map-${k}-${f.k}">We couldn’t find the <strong>${f.label.toLowerCase()}</strong> column in ${esc(d.name)}. Which one is it?</label><select id="map-${k}-${f.k}" data-map="${k}:${f.k}" style="width:auto"><option value="-1">Choose a column</option>${d.headers.map((h,i)=>`<option value="${i}">${esc(h||'(no name)')}</option>`).join('')}</select></div></li>`));
+    o[k].e.filter(m=>!m.startsWith('Pick the column')).forEach(m=>att.push(`<li>${esc(m)}</li>`));
+    o[k].w.filter(m=>!m.startsWith('No “')).forEach(m=>att.push(`<li>${esc(m)}</li>`));
+  });
+  if(menu.length) S.photos.filter(p=>!p.dish).forEach(p=>att.push(`<li><div class="fix"><span class="row" style="flex-wrap:nowrap"><img class="fiximg" src="${p.url}" alt=""><label for="ph-${p.id}">We couldn’t match <strong>${esc(p.name)}</strong> to a dish. Which dish is it?</label></span><select id="ph-${p.id}" data-photo="${p.id}" style="width:auto"><option value="">Not a menu dish</option>${menu.map(m=>`<option>${esc(m.dish)}</option>`).join('')}</select></div></li>`));
+  const missing=[!S.menu&&'menu CSV',!S.sales&&'sales CSV',!n&&'dish photos'].filter(Boolean);
+  return `<div class="one">
+    <div class="stack" style="gap:6px"><h2>Add your files</h2><p class="muted">Your menu, one week of sales, and 8–10 dish photos. Add them all at once.</p></div>
+    ${S.stale?'<div class="note warn">Your files changed. Analyze again to refresh the recommendation.</div>':''}
+    ${drop}
+    ${list}
+    ${att.length?`<section class="attn" aria-labelledby="h-att"><h3 id="h-att">Needs a quick look</h3><ul>${att.join('')}</ul></section>`:''}
+    ${S.analysisErr?`<div class="note bad" role="alert"><strong>The analysis didn’t finish.</strong> ${esc(S.analysisErr)} Your files are still here.</div>`:''}
+    <div class="stack" style="gap:8px;align-items:flex-start">
+      <button class="btn primary big" data-act="analyze" ${o.ready&&!S.busy.analyze?'':'disabled'}>${S.busy.analyze?'<span class="spin"></span> Analyzing':S.analysisErr?'Try again':'Analyze my files'}</button>
+      ${!o.ready&&any?`<p class="muted" style="font-size:.9rem">${missing.length?'Still needed: '+missing.join(', ')+'.':'Answer the questions above to continue.'}</p>`:''}
+      ${S.analysis?'<a class="linkish" href="#recommendation">Back to the recommendation</a>':''}
+    </div>
+    <details class="adv"><summary>Using your own server?</summary>
+      <div class="stack" style="margin-top:10px"><label class="f" for="api">Server address<input type="url" id="api" placeholder="https://your-server.example" value="${esc(S.apiBase)}" data-api></label>
+      <p class="muted" style="font-size:.85rem">Leave this empty to analyze the files and build the video right here in your browser. Enter an address only, never an API key.</p></div>
+    </details>
+  </div>`;
+}
+
+function viewRecommend(){
+  const a=S.analysis,t=curTarget(),two=a.targets.length>1;
+  const bars=a.bars&&a.bars[t.type],max=bars?Math.max(1,...bars.map(b=>b.v)):1;
+  if(S.postSource==='backend'&&!API.on()) S.postSource='paste';
+  if(API.on()) S.postSource='backend';
+  const brief=JSON.stringify({promote:t.type,name:t.name,dish:t.feature,price:t.price||null,category:t.category||null,reason:t.reason},null,2);
+  const can=API.on()||S.pasteText.trim().length>0;
+  return `<div class="one">
+    <div class="stack" style="gap:14px">
+      <span class="eyebrow">${t.type==='dish'?'We recommend promoting':'We recommend promoting your quietest day'}${S.demo?' · sample data':''}</span>
+      <h1 style="font-size:clamp(2.2rem,6vw,3.6rem)">${esc(t.name)}</h1>
+      <p style="font-size:1.15rem;max-width:36em">${esc(t.reason)}</p>
+      ${t.type==='day'&&t.feature?`<p class="muted">The video will feature ${esc(t.feature)}.</p>`:''}
+      ${two?`<fieldset style="border:0;padding:0;margin:4px 0 0"><legend class="sr">What to promote</legend><div class="seg">${a.targets.map(x=>`<label><input class="sr" type="radio" name="tt" value="${x.type}" ${x.type===t.type?'checked':''} data-tt><span>${x.type==='dish'?'Slowest dish':'Quietest day'}</span></label>`).join('')}</div></fieldset>`:''}
+      ${bars?`<details class="adv"><summary>See the numbers</summary><div class="bars" style="margin-top:12px">${bars.map(b=>`<div class="bar ${b.t===t.name?'hit':''}"><span class="t" title="${esc(b.t)}">${esc(b.t)}</span><div class="tr"><i style="width:${(b.v/max*100).toFixed(1)}%"></i></div><em>${b.v}</em></div>`).join('')}</div><p class="muted" style="font-size:.82rem;margin-top:8px">${t.type==='dish'?'Units sold per dish':'Items sold per day'}, from ${esc(S.sales.name)}.</p></details>`:''}
+    </div>
+    <section class="stack" style="gap:12px">
+      ${API.on()?'':`<label class="f" for="paste" style="font-size:.95rem">Paste the post your AI notebook wrote<textarea id="paste" rows="4" placeholder='{"hook":"…","caption":"…","hashtags":["#…"],"cta":"…"}' data-paste>${esc(S.pasteText)}</textarea></label>
+      <div><button class="linkish" data-act="copy-brief">Copy this recommendation for the notebook</button></div>`}
+      ${S.postErr?`<div class="note bad" role="alert"><strong>The campaign wasn’t created.</strong> ${esc(S.postErr)}</div>`:''}
+      <div class="row"><button class="btn primary big" id="gen" data-act="create" ${S.busy.post||!can?'disabled':''}>${S.busy.post?'<span class="spin"></span> Creating':S.postErr?'Try again':'Create my campaign'}</button></div>
+      ${API.on()?'':'<p class="muted" style="font-size:.9rem">No AI post yet? <button class="linkish" data-act="create-template">Use a plain template instead</button> (not written by AI).</p>'}
+      <textarea class="sr" id="briefsrc" tabindex="-1" aria-hidden="true" readonly>${esc(brief)}</textarea>
+    </section>
+    <a class="linkish" href="#assets">Back to my files</a>
+  </div>`;
+}
+
+function fullPost(p){return [p.hook,'',p.caption,'',p.cta,'',p.hashtags.join(' ')].join('\n').trim();}
+function viewResults(){
+  const c=S.campaign,p=c.post,v=S.video,nh=p.hashtags.length;
+  let stage;
+  if(S.busy.video) stage=`<canvas id="vcanvas" width="1080" height="1920" aria-label="Video being made"></canvas>`;
+  else if(v) stage=`<video src="${v.url}" controls playsinline loop aria-label="Your promo video"></video>`;
+  else stage=`<div class="ph"><strong>No video yet</strong></div>`;
+  return `<div class="res">
+    <div class="stack">
+      <div class="phone">${stage}</div>
+      ${S.busy.video?`<div class="stack" style="gap:6px"><div class="prog" role="progressbar" aria-label="Video progress"><i id="vprog"></i></div><p class="muted" style="font-size:.88rem">${API.on()?'Making your video…':'Making your video. <span id="vpct">0%</span>. Keep this tab open.'}</p></div>`:''}
+      ${S.videoErr?`<div class="note bad" role="alert"><strong>The video wasn’t made.</strong> ${esc(S.videoErr)}</div>`:''}
+      ${v?`<button class="btn primary big" data-act="dl-video">Download video</button><p class="muted" style="font-size:.82rem;text-align:center">Vertical 9:16${v.duration?` · ${v.duration} seconds`:''} · .${esc(v.ext)}</p>`
+         :S.busy.video?'':`<button class="btn primary" data-act="video">${S.videoErr?'Try again':'Make the video'}</button>`}
+    </div>
+    <div class="stack" style="gap:18px">
+      <div class="stack" style="gap:6px"><h2>Your campaign for ${esc(c.target.feature||c.target.name)}</h2><p class="muted">${esc(c.target.reason)}</p>
+        ${c.source==='template'?'<p><span class="pill warn">Plain template, not written by AI</span></p>':''}${S.demo?'<p><span class="pill warn">Sample data</span></p>':''}</div>
+      <section class="stack" aria-label="Post text" style="gap:12px">
+        <label class="f" for="f-hook">Hook<input type="text" id="f-hook" value="${esc(p.hook)}" data-post="hook"></label>
+        <label class="f" for="f-caption">Caption<textarea id="f-caption" rows="4" data-post="caption">${esc(p.caption)}</textarea></label>
+        <label class="f" for="f-tags">Hashtags<input type="text" id="f-tags" value="${esc(p.hashtags.join(' '))}" data-post="hashtags"><span id="tagcount" class="muted" style="font-weight:400">${nh>=5&&nh<=8?'':`${nh} hashtags. 5–8 works best.`}</span></label>
+        <label class="f" for="f-cta">Call to action<input type="text" id="f-cta" value="${esc(p.cta)}" data-post="cta"></label>
+        ${S.postErr?`<div class="note bad" role="alert">${esc(S.postErr)}</div>`:''}
+        <div class="row"><button class="btn primary big" data-act="copy-full">Copy post</button>
+          <button class="btn" data-act="regen" ${S.busy.post?'disabled':''}>${S.busy.post?'<span class="spin"></span> Regenerating':c.source==='paste'?'Paste a new post':'Regenerate'}</button></div>
+      </section>
+      ${c.variants?`<details class="adv"><summary>Compare ${c.variants.length} versions (A/B test)</summary><div class="vars" style="margin-top:12px">${c.variants.map((x,i)=>`<div class="card stack" style="gap:8px;${i===c.active?'border-color:var(--accent)':''}"><span class="pill acc" style="align-self:flex-start">Version ${'ABCDE'[i]}${x.label?' · '+esc(x.label):''}</span><strong>${esc(x.hook)}</strong><button class="btn small" data-act="use-var" data-i="${i}" ${i===c.active?'disabled':''}>${i===c.active?'In use':'Use this one'}</button></div>`).join('')}</div></details>`:''}
+      ${c.calendar?`<details class="adv"><summary>7-day posting plan</summary><div class="cal" tabindex="0" style="margin-top:12px">${c.calendar.map((d,i)=>`<div class="card stack" style="gap:6px"><span class="pill" style="align-self:flex-start">${esc(d.day||d.date||'Day '+(i+1))}</span>${d.dish?`<strong>${esc(d.dish)}</strong>`:''}<span class="muted">${esc(d.idea||d.post||d.hook||d.reason||'')}</span></div>`).join('')}</div></details>`:''}
+      <p class="muted" style="font-size:.9rem"><a class="linkish" href="#assets">Back to my files</a> · <a class="linkish" href="#recommendation">Change the recommendation</a>${v&&!S.busy.video?' · <button class="linkish" data-act="video">Remake the video</button>':''} · <label class="linkish" tabindex="0">Use a video file instead<input class="sr" type="file" accept="video/*" data-vfile tabindex="-1"></label></p>
+    </div>
+  </div>`;
+}
+
+function render(){
+  renderNav();
+  $('#app').innerHTML={home:viewHome,assets:viewAssets,recommendation:viewRecommend,results:viewResults}[S.view]();
+  document.title='PlateReel';
+}
+
+/* ---------- events ---------- */
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-act]'); if(!b||b.disabled) return;
+  const a=b.dataset.act,c=S.campaign;
+  if(a==='demo') loadDemo();
+  else if(a==='exit-demo'){ e.preventDefault(); S.photos.forEach(p=>URL.revokeObjectURL(p.url)); Object.assign(S,{demo:false,intakeErr:[],pending:[],menu:null,sales:null,photos:[],analysis:null,campaign:null,video:null,stale:false,pasteText:''}); go('assets'); render(); }
+  else if(a==='rm-menu'||a==='rm-sales'){ S[a.slice(3)]=null; changed(); render(); }
+  else if(a==='rm-photo'){ const i=S.photos.findIndex(p=>p.id===b.dataset.id); if(i>=0){URL.revokeObjectURL(S.photos[i].url);S.photos.splice(i,1);} changed(); render(); }
+  else if(a==='rm-photos'){ S.photos.forEach(p=>URL.revokeObjectURL(p.url)); S.photos=[]; changed(); render(); }
+  else if(a==='pend'){ const r=S.pending.splice(+b.dataset.i,1)[0]; setCsv(b.dataset.k,r); changed(); render(); }
+  else if(a==='rm-pend'){ S.pending.splice(+b.dataset.i,1); render(); }
+  else if(a==='create-template'){ S.postSource='template'; createCampaign(); }
+  else if(a==='analyze') runAnalysis();
+  else if(a==='create') createCampaign();
+  else if(a==='copy-brief') copyText($('#briefsrc').value,'Pick');
+  else if(a==='video') makeVideo();
+  else if(a==='dl-video'&&S.video){ if(S.video.source==='backend') window.open(S.video.url,'_blank'); else download(S.video.url,'promo.'+S.video.ext); }
+  else if(a==='copy-full') copyText(fullPost(c.post),'Full post');
+  else if(a==='copy-caption') copyText(c.post.caption,'Caption');
+  else if(a==='dl-post') download('data:text/plain;charset=utf-8,'+encodeURIComponent(fullPost(c.post)),'post.txt');
+  else if(a==='use-var'){ c.active=+b.dataset.i; c.post={...c.variants[c.active]}; render(); }
+  else if(a==='regen'){
+    if(c.source==='paste'){ S.postSource='paste'; go(S.analysis?'recommendation':'assets'); }
+    else if(c.source==='template'){ S.tplIdx++; c.post=templatePost(c.target); render(); toast('New draft'); }
+    else { S.busy.post=true; S.postErr=null; render(); API.post(c.target).then(r=>{Object.assign(c,parsePosted(r),{active:0});}).catch(er=>{S.postErr='Regenerating failed. '+er.message+' Your current text is unchanged.';}).finally(()=>{S.busy.post=false;render();}); }
+  }
+});
+document.addEventListener('change',e=>{
+  const t=e.target;
+  if(t.dataset.file){ const fs=[...t.files]; if(fs.length) addFiles(fs); }
+  else if(t.dataset.replace){ if(t.files[0]){ S.intakeErr=[]; loadCsv(t.dataset.replace,t.files[0]).then(render); } }
+  else if(t.dataset.map){ const [k,f]=t.dataset.map.split(':'); S[k].map[f]=+t.value; changed(); render(); }
+  else if(t.dataset.photo!==undefined){ const p=S.photos.find(x=>x.id===t.dataset.photo); p.dish=t.value||null; p.manual=true; changed(); render(); }
+  else if('api' in t.dataset){ const v=t.value.trim(); if(v&&!/^https?:\/\//i.test(v)){ toast('Enter a full URL starting with http:// or https://'); t.value=S.apiBase; return; } S.apiBase=v; S.postSource=v?'backend':'paste'; changed(); render(); }
+  else if('tt' in t.dataset){ S.targetType=t.value; render(); }
+  else if('src' in t.dataset){ S.postSource=t.value; S.postErr=null; render(); }
+  else if('vdur' in t.dataset){ S.vdur=+t.value; }
+  else if('vfile' in t.dataset){ loadVideoFile(t.files[0]); }
+});
+document.addEventListener('input',e=>{
+  const t=e.target;
+  if('paste' in t.dataset){ S.pasteText=t.value; const g=$('#gen'); if(g&&!S.busy.post) g.disabled=!t.value.trim(); }
+  else if(t.dataset.post&&S.campaign){
+    const p=S.campaign.post,k=t.dataset.post;
+    if(k==='hashtags'){ p.hashtags=t.value.split(/[\s,]+/).filter(Boolean).map(x=>x.startsWith('#')?x:'#'+x); const n=p.hashtags.length; $('#tagcount').textContent=n>=5&&n<=8?'':`${n} hashtags. 5–8 works best.`; }
+    else p[k]=t.value;
+  }
+});
+document.addEventListener('keydown',e=>{ if((e.key==='Enter'||e.key===' ')&&e.target.matches('label[tabindex]')){ e.preventDefault(); e.target.querySelector('input').click(); } });
+['dragenter','dragover'].forEach(ev=>document.addEventListener(ev,e=>{const d=e.target.closest&&e.target.closest('[data-drop]'); if(d){e.preventDefault();d.classList.add('over');} else if(e.dataTransfer&&[...e.dataTransfer.types].includes('Files')) e.preventDefault();}));
+document.addEventListener('dragleave',e=>{const d=e.target.closest&&e.target.closest('[data-drop]'); if(d&&!d.contains(e.relatedTarget)) d.classList.remove('over');});
+document.addEventListener('drop',e=>{
+  if(!e.dataTransfer||!e.dataTransfer.files.length) return; e.preventDefault();
+  const d=e.target.closest&&e.target.closest('[data-drop]'); if(!d){ if(S.view==='assets') addFiles([...e.dataTransfer.files]); return; }
+  d.classList.remove('over'); addFiles([...e.dataTransfer.files]);
+});
+window.addEventListener('hashchange',route);
+route();
+</script>
+</body>
+</html>
